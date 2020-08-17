@@ -1,23 +1,24 @@
-import pandas as pd
-from configuration.config import Config
-from data_layer.raw_data_api import Raw_Data_Api
-from pre_analysis.pre_analysis_api import Pre_Analysis_Api
+from get_data_layer.data_reader import Data_Reader
+from pre_analysis.data_api import Data_Api
+from data_layer.prep_data_api import Prep_Data_Api
 
 
 class Pipeline:
     def __init__(self):
-        self.raw_df = None
+        self.patients = []
 
     def get_data(self):
-        raw_data_api = Raw_Data_Api()
-        self.raw_df = raw_data_api.get_raw_data()
-
-    def preliminary_analysis(self):
-        pre_analysis_api = Pre_Analysis_Api(raw_df=self.raw_df)
-        pre_analysis_api.run_pre_analysis()
+        data_reader = Data_Reader()
+        self.patients = data_reader.read_data()
 
     def prep_data(self):
-        print('data is prepped')
+        data_api = Data_Api(patients=self.patients)
+        data_api.run_missing_value_analysis()
+
+    def prep_data_old(self):
+        prep_data_api = Prep_Data_Api(patients=self.patients)
+        # prep_data_api.prep_data()
+        # self.prep_df = prep_data_api.df
 
     def basic_analysis(self):
         pass
