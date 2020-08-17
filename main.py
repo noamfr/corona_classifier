@@ -8,7 +8,7 @@ if __name__ == '__main__':
     pipeline = Pipeline()
 
     pipeline.get_data()
-    pipeline.preliminary_analysis()
     pipeline.prep_data()
+    pipeline.prep_data_old()
     pipeline.basic_analysis()
     pipeline.run_classification()

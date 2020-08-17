@@ -9,7 +9,7 @@ class Pipeline:
 
     def get_data(self):
         data_reader = Data_Reader()
-        self.patients = data_reader.read_data()
+        self.patients = data_reader.get_patients()
 
     def prep_data(self):
         data_api = Data_Api(patients=self.patients)
