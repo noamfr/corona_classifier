@@ -32,14 +32,14 @@ class Pipeline_Executor:
             print("================ Finished running: " + step + " ================")
             timer.print_elapsed_time()
 
-            if self.save_progress:
-                self.__save_pipeline_to_pickle(step)
+            self.__save_pipeline_to_pickle(step)
 
     def __save_pipeline_to_pickle(self, step):
-        logging.info("================ Saving: " + step + " to pickle ================")
-        print("================ Saving: " + step + " to pickle ================")
-        with open(path.join(self.pickle_path, self.job_key+'.pickle'), 'wb') as handle:
-            pickle.dump(obj=self.pipeline, file=handle)
+        if self.save_progress:
+            logging.info("================ Saving: " + step + " to pickle ================")
+            print("================ Saving: " + step + " to pickle ================")
+            with open(path.join(self.pickle_path, self.job_key+'.pickle'), 'wb') as handle:
+                pickle.dump(obj=self.pipeline, file=handle)
 
     def __load_pickle(self):
         logging.info("================ Loading pickle file ===========")

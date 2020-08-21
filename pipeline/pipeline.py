@@ -1,27 +1,30 @@
-from get_data_layer.data_reader import Data_Reader
-from pre_analysis.data_api import Data_Api
-from data_layer.prep_data_api import Prep_Data_Api
+from get_data.data_reader import Data_Reader
+from missing_values.missing_values import Missing_Values
+from data.prep_data import Prep_Data
+from basic_analysis.basic_analysis import Basic_Analysis
 
 
 class Pipeline:
     def __init__(self):
         self.patients = []
+        self.fields_not_in_analysis = []
 
     def get_data(self):
         data_reader = Data_Reader()
         self.patients = data_reader.get_patients()
 
-    def prep_data(self):
-        data_api = Data_Api(patients=self.patients)
-        data_api.run_missing_value_analysis()
+    def treat_missing_values(self):
+        missing_values_remover = Missing_Values(patients=self.patients)
+        missing_values_remover.remove_data_fields_with_to_much_missing_data()
 
-    def prep_data_old(self):
-        prep_data_api = Prep_Data_Api(patients=self.patients)
-        # prep_data_api.prep_data()
-        # self.prep_df = prep_data_api.df
+    def prep_data(self):
+        prep_data = Prep_Data(patients=self.patients)
+        prep_data.prep_data()
+        self.patients = prep_data.patients
 
     def basic_analysis(self):
-        pass
+        basic_analysis = Basic_Analysis(patients=self.patients)
+        basic_analysis.calc()
 
     def run_classification(self):
         pass

@@ -1,6 +1,6 @@
 from os import listdir, path
 import csv
-from configuration.config import Config
+from config.config import Config
 from .patient import Patient
 from .data_fields import Data_Fields
 

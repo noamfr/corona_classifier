@@ -1,6 +1,6 @@
 from pipeline.pipeline import Pipeline
 from infra.pipeline_executor import Pipeline_Executor
-from configuration.config import Config
+from config.config import Config
 
 SAVE_PROGRESS = True
 JOB_KEY = 'corona_classifier'
@@ -11,6 +11,7 @@ if __name__ == '__main__':
 
     steps = [
         'get_data',
+        'treat_missing_values',
         'prep_data',
         'basic_analysis',
         'run_classification'
