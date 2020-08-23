@@ -1,9 +1,11 @@
 import os
-import statistics
+from statistics import mean
 import pandas as pd
+from collections import defaultdict
 from config.config import Config
 from get_data.data_fields import Data_Fields
 from infra.graph_operations import bar_chart
+from infra.data_operations import remove_missing_values_from_array
 
 
 class Basic_Analysis:
@@ -12,35 +14,41 @@ class Basic_Analysis:
         self.local_output_path = os.path.join(Config.OUTPUT_PATH, 'basic_analysis')
 
     def calc(self):
-        self.__target_frequency()
+        self.__binary_fields_frequency()
 
-    def __target_frequency(self):
-        target_field = Data_Fields.get_target()
-        target_array = [getattr(patient, target_field) for patient in self.patients]
+    def __binary_fields_frequency(self):
+        binary_data_fields_arrays = {}
 
-        total_patients = len(target_array)
-        corona_positive_percent = statistics.mean(target_array)
-        corona_negative_percent = 1 - corona_positive_percent
+        for field in Data_Fields.get_binary_vars():
+            binary_data_fields_arrays[field] = [getattr(patient, field) for patient in self.patients]
+            if None in binary_data_fields_arrays[field]:
+                binary_data_fields_arrays[field] = remove_missing_values_from_array(binary_data_fields_arrays[field])
 
-        corona_positive_count = total_patients * corona_positive_percent
-        corona_negative_count = total_patients * corona_negative_percent
+        data_dict = defaultdict(list)
+        for field in binary_data_fields_arrays:
+            positive_percent = mean(binary_data_fields_arrays[field])
+            negative_percent = 1 - positive_percent
 
-        status = ['corona_positive', 'corona_negative', 'total']
-        percent = [corona_positive_percent, corona_negative_percent,
-                   corona_positive_percent+corona_negative_percent]
-        count = [corona_positive_count, corona_negative_count, total_patients]
+            total_patients = len(binary_data_fields_arrays[field])
+            positive_count = total_patients * positive_percent
+            negative_count = total_patients * negative_percent
+            missing_count = len(self.patients) - total_patients
 
-        df = pd.DataFrame(list(zip(status, percent, count)),
-                          columns=['status', 'percent', 'count'])
+            data_dict['data_field'].append(field)
+            data_dict['positive_percent'].append(positive_percent)
+            data_dict['negative_percent'].append(negative_percent)
+            data_dict['positive_count'].append(positive_count)
+            data_dict['negative_count'].append(negative_count)
+            data_dict['missing_count'].append(missing_count)
 
-        df.to_csv(os.path.join(self.local_output_path,
-                               'target_frequency.csv'))
+        df = pd.DataFrame(data_dict)
+        df.to_csv(os.path.join(self.local_output_path, 'binary_fields_frequency.csv'))
 
-        bar_chart(x=status[:-1],
-                  y=percent[:-1],
-                  x_label='corona_test_result',
-                  y_label='%',
-                  title='corona_test_result_frequency',
+        bar_chart(x=df.data_field,
+                  y=df.positive_percent,
+                  x_label='data field',
+                  y_label='positive %',
+                  title='binary_fields_frequency',
                   output_path=self.local_output_path)
 
     def __binary_fields_by_target(self):
