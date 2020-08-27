@@ -119,7 +119,7 @@ class Missing_Values:
 
     def __remove_fields(self):
         data_field_remover = Data_field_remover(data_field_class=Data_Fields,
-                                                fields_to_remove= self.__get_fields_not_in_analysis())
+                                                fields_to_remove=self.__get_fields_not_in_analysis())
         data_field_remover.remove_date_fields()
 
     @staticmethod
