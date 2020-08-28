@@ -1,11 +1,13 @@
 import os
 from statistics import mean
+import numpy as np
 import pandas as pd
-from collections import defaultdict, Counter
+from collections import defaultdict
 from config.config import Config
 from get_data.data_fields import Data_Fields
 from infra.graph_operations import bar_chart
-from infra.data_operations import remove_missing_values_from_array
+from infra.data_operations.remove_missing_values_from_array import remove_missing_values_from_array
+from infra.data_operations.descriptive_table import Descriptive_Table
 from .crosstab import Cross_Tab_Binary
 
 
@@ -14,10 +16,17 @@ class Basic_Analysis:
         self.patients = patients
         self.local_output_path = os.path.join(Config.OUTPUT_PATH, 'basic_analysis')
         self.binary_data_fields_arrays = None
+        self.continuous_fields_arrays = None
+
+        self.__build_vectors()
 
     def calc(self):
-        self.__binary_fields_frequency()
-        self.__binary_fields_by_target()
+        # self.__binary_fields_frequency()
+        # self.__binary_fields_by_target()
+        self.__continuous_fields_descriptive_table()
+
+    def __build_vectors(self):
+        self.__build_continuous_fields_vectors()
 
     def __binary_fields_frequency(self):
         binary_data_fields_arrays = {}
@@ -94,8 +103,41 @@ class Basic_Analysis:
             report_dict['field_neg_corona_pos_percent'].append(field_negative_corona_positive_percent)
             report_dict['field_neg_corona_neg_percent'].append(field_negative_corona_negative_percent)
 
-            report_dict['corona_pos_percent_for_field_positives'].append(corona_positive_percent_for_field_positives)
-            report_dict['corona_pos_percent_for_field_negatives'].append(corona_positive_percent_for_field_negatives)
+            report_dict['corona_positive_and_field_positive'].append(corona_positive_percent_for_field_positives)
+            report_dict['corona_positive_and_field_negative'].append(corona_positive_percent_for_field_negatives)
 
         df = pd.DataFrame(report_dict)
         df.to_csv(os.path.join(self.local_output_path, 'binary_fields_by_target.csv'))
+
+    def __build_continuous_fields_vectors(self):
+        continuous_fields = Data_Fields.get_continuous_vars()
+        continuous_fields_arrays = {}
+
+        for field in continuous_fields:
+            vector = [getattr(patient, field) for patient in self.patients]
+
+            if None in vector:
+                vector = remove_missing_values_from_array(vector)
+
+            vector = [float(value) for value in vector]
+            continuous_fields_arrays[field] = np.array(vector)
+
+        self.continuous_fields_arrays = continuous_fields_arrays
+
+    def __continuous_fields_descriptive_table(self):
+        continuous_fields = Data_Fields.get_continuous_vars()
+        continuous_fields_arrays = {}
+
+        for field in continuous_fields:
+            vector = [getattr(patient, field) for patient in self.patients]
+
+            if None in vector:
+                vector = remove_missing_values_from_array(vector)
+
+            vector = [float(value) for value in vector]
+            continuous_fields_arrays[field] = np.array(vector)
+
+        descriptive_table = Descriptive_Table(vector_dict=continuous_fields_arrays)
+        df = descriptive_table.get_descriptive_table()
+        df.to_csv(os.path.join(self.local_output_path, 'continuous_fields_descriptive_table.csv'))
+

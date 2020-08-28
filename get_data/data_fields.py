@@ -97,6 +97,15 @@ class Data_Fields(Enum):
         return binary_vars
 
     @classmethod
+    def get_continuous_vars(cls):
+        continuous_vars = []
+        for var_name in Data_Fields.get_all_data_fields():
+            if getattr(Data_Fields, var_name.upper()).data_class == Data_Classes.CONTINUOUS and \
+                    getattr(Data_Fields, var_name.upper()).in_analysis:
+                continuous_vars.append(var_name)
+        return continuous_vars
+
+    @classmethod
     def get_all_data_fields(cls):
         return [
             Data_Fields.BATCH_DATE.field_name,
