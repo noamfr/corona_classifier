@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def remove_missing_values_from_array(array):
     idxs_to_remove = []
     for idx in range(len(array)):
