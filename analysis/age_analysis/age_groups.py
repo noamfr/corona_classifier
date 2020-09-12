@@ -3,19 +3,20 @@ class Age_Groups:
     TODDLER = 'toddler_(3-5)'
     CHILD = 'child_(6-12)'
     ADOLESCENT = 'adolescent_(13-17)'
-    ADULT = 'adult_(18+)'
 
     CHILDREN = 'child_(0-17)'
+    ADULT = 'adult_(18+)'
 
-    ADULT_AGE_GROUP_1 = 'age 18-24'
-    ADULT_AGE_GROUP_2 = 'age 25-34'
-    ADULT_AGE_GROUP_3 = 'age 35-44'
-    ADULT_AGE_GROUP_4 = 'age 45-54'
-    ADULT_AGE_GROUP_5 = 'age 55-64'
-    ADULT_AGE_GROUP_6 = 'age 65+'
+    AGE_18_24 = 'age 18-24'
+    AGE_25_34 = 'age 25-34'
+    AGE_35_44 = 'age 35-44'
+    AGE_45_54 = 'age 45-54'
+    AGE_55_64 = 'age 55-64'
+    AGE_65_99 = 'age 65-99'
+    AGE_100_OR_MORE = 'age_100_or_more'
 
     @classmethod
-    def get_age_groups_binary(cls):
+    def age_groups_binary(cls):
         return [Age_Groups.CHILDREN, Age_Groups.ADULT]
 
     @classmethod
@@ -24,8 +25,8 @@ class Age_Groups:
 
     @classmethod
     def get_adult_age_groups(cls):
-        return [Age_Groups.ADULT_AGE_GROUP_1, Age_Groups.ADULT_AGE_GROUP_2, Age_Groups.ADULT_AGE_GROUP_3,
-                Age_Groups.ADULT_AGE_GROUP_4, Age_Groups.ADULT_AGE_GROUP_5, Age_Groups.ADULT_AGE_GROUP_6]
+        return [Age_Groups.AGE_18_24, Age_Groups.AGE_25_34, Age_Groups.AGE_35_44,
+                Age_Groups.AGE_45_54, Age_Groups.AGE_55_64, Age_Groups.AGE_65_99]
 
     @classmethod
     def get_children_age_groups(cls):
@@ -34,3 +35,7 @@ class Age_Groups:
     @classmethod
     def get_all__age_groups(cls):
         return Age_Groups.get_children_age_groups() + Age_Groups.get_adult_age_groups()
+
+    @classmethod
+    def children_and_adult_age_groups(cls):
+        return [Age_Groups.CHILDREN] + Age_Groups.get_adult_age_groups()
