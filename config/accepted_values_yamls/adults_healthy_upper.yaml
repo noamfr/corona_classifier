@@ -1,0 +1,12 @@
+# adults_healthy_upper
+
+population: 'adults'
+threshold_category: 'healthy_values'
+threshold_type: 'upper'
+
+temperature: 37.0
+pulse: 120
+sys: 130
+dia: 90
+rr: 30
+sats: 100

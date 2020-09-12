@@ -1,0 +1,12 @@
+# adults_healthy_lower
+
+population: 'adults'
+threshold_category: 'healthy_values'
+threshold_type: 'lower'
+
+temperature: 35.5
+pulse: 60
+sys: 80
+dia: 50
+rr: 10
+sats: 90
