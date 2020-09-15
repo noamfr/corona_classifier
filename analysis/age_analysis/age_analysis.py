@@ -3,17 +3,17 @@ import numpy as np
 from typing import List
 
 from data_operations.data_frame_printer import Data_Frame_Printer
-from data_operations.descriptive_table import Descriptive_Table
-from histogram import hist
+from analysis_operations.descriptive_table import Descriptive_Table
+from analysis_operations.graph_functions import histogram
 
 from config.config import Config
 
 
 class Age_Analysis:
-    def __init__(self, patients: List, print_results: bool):
+    def __init__(self, patients: List, publish_results: bool):
         self.patients = patients
-        self.print_results = print_results
-        self.local_output_path = os.path.join(Config.OUTPUT_PATH, 'analysis', '')
+        self.publish_results = publish_results
+        self.local_output_path = os.path.join(Config.OUTPUT_PATH, 'age_analysis')
 
         self.continuous_vectors = None
         self.categorical_vectors = None
@@ -25,7 +25,7 @@ class Age_Analysis:
         self.age_descriptive_table = self.__age_descriptive_table()
         self.__age_vector_histograms()
 
-        if self.print_results:
+        if self.publish_results:
             self.__print_results()
 
     def __print_results(self):
@@ -52,12 +52,12 @@ class Age_Analysis:
 
     def __age_vector_histograms(self):
         for vec in self.continuous_vectors:
-            hist(vector=self.continuous_vectors[vec],
-                 label=vec,
-                 x_label='age',
-                 y_label='count',
-                 add_mean_line=True,
-                 path=self.local_output_path)
+            histogram(vector=self.continuous_vectors[vec],
+                      label=vec,
+                      x_label='age',
+                      y_label='count',
+                      add_mean_line=True,
+                      path=self.local_output_path)
 
     def __age_vector_bar_plots(self):
         pass
