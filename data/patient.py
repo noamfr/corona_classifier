@@ -1,3 +1,5 @@
+from config.config import Config
+from analysis.age_analysis.age_groups import Age_Groups
 
 
 class Patient:
@@ -57,3 +59,46 @@ class Patient:
         self.cxr_link = None
         self.er_referral = None
         self.source_file = source_file
+
+    @property
+    def is_adult(self):
+        if int(self.age) < Config.ADULT_AGE_THRESHOLD:
+            return 0
+
+        else:
+            return 1
+
+    @property
+    def age_category(self):
+        if 0 < self.age <= 2:
+            return Age_Groups.BABY
+
+        elif 3 < self.age <= 5:
+            return Age_Groups.TODDLER
+
+        elif 6 < self.age <= 12:
+            return Age_Groups.CHILD
+
+        elif 13 < self.age <= 17:
+            return Age_Groups.ADOLESCENT
+
+        elif 18 < self.age <= 24:
+            return Age_Groups.AGE_18_24
+
+        elif 25 < self.age <= 34:
+            return Age_Groups.AGE_25_34
+
+        elif 35 < self.age <= 44:
+            return Age_Groups.AGE_35_44
+
+        elif 45 < self.age <= 54:
+            return Age_Groups.AGE_45_54
+
+        elif 55 < self.age <= 64:
+            return Age_Groups.AGE_55_64
+
+        elif 65 < self.age <= 99:
+            return Age_Groups.AGE_65_99
+
+        else:
+            return Age_Groups.AGE_100_OR_MORE

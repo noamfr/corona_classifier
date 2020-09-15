@@ -1,4 +1,3 @@
-from builtins import int
 from enum import Enum
 
 
@@ -8,20 +7,6 @@ class Data_Classes:
     CONTINUOUS = 'continuous'
     TEXT = 'text'
     NOT_IN_USE = 'not_in_use'
-
-    class Data_Classes_a:
-        BINARY: str
-        CATEGORICAL: str
-        CONTINUOUS: str
-        TEXT: str
-        NOT_IN_USE: str
-
-        def __init__(self):
-            __class__BINARY = 'binary'
-            __class__CATEGORICAL = 'categorical'
-            __class__CONTINUOUS = 'continuous'
-            __class__TEXT = 'text'
-            __class__NOT_IN_USE = 'not_in_use'
 
 
 class Data_Fields(Enum):
