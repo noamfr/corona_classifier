@@ -1,9 +1,9 @@
 import os
 import numpy as np
+import pandas as pd
 from typing import List, Dict
 
-from data_operations.build_ndarray_from_objects import build_nd_array_from_objects
-from data_operations.data_frame_printer import Data_Frame_Printer
+from data_operations.build_ndarray_from_objects import build_nd_array_from_object_list
 from analysis_operations.descriptive_table import Descriptive_Table
 from config.config import Config
 from data.data_fields import Data_Fields
@@ -17,28 +17,39 @@ class Continuous_Fields_Analysis:
         self.vectors: Dict[str: np.ndarray]
         self.descriptive_table = None
 
+        self.__build_vectors(remove_missing_values=True)
+
     def run_analysis(self):
-        self.__continuous_fields_descriptive_table()
+        self.__descriptive_table()
+        self.__correlation_matrix()
 
         if self.publish_results:
             self.__publish_results_to_file()
 
-    def __continuous_fields_descriptive_table(self):
-        self.__build_vectors(remove_missing_values=False)
-        self.descriptive_table = Descriptive_Table(vector_dict=self.vectors)
+    def __descriptive_table(self):
+        descriptive_table = Descriptive_Table(vector_dict=self.vectors)
+        self.descriptive_table = descriptive_table.get_descriptive_table()
+
+    def __correlation_matrix(self):
+        df = pd.DataFrame(self.vectors)
+
+        corr = df.corr()
+        corr.style.background_gradient(cmap='coolwarm')
+
+    def __average_by_target(self):
+        pass
 
     def __build_vectors(self, remove_missing_values: bool):
         continuous_fields = Data_Fields.get_continuous_vars()
         vector_dict = {}
 
         for field in continuous_fields:
-            vector = build_nd_array_from_objects(object_list=self.patients,
-                                                 field_name=field,
-                                                 remove_missing_values=remove_missing_values)
+            vector = build_nd_array_from_object_list(object_list=self.patients,
+                                                     field_name=field,
+                                                     remove_missing_values=remove_missing_values)
             vector_dict[field] = vector
         self.vectors = vector_dict
 
     def __publish_results_to_file(self):
-        df_printer = Data_Frame_Printer(path=self.local_output_path)
-        df_printer.print_df_from_defaultdict(default_dict=self.descriptive_table,
-                                             file_name='descriptive_table.csv')
+        descriptive_table_df = pd.DataFrame(self.descriptive_table)
+        descriptive_table_df.to_csv(os.path.join(self.local_output_path, 'descriptive_table.csv'))
