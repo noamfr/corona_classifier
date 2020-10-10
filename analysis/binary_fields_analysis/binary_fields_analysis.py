@@ -4,7 +4,7 @@ import numpy as np
 from typing import List, Dict
 from collections import defaultdict
 
-from data_operations.build_ndarray_from_objects import build_nd_array_from_objects
+from data_operations.build_ndarray_from_objects import build_nd_array_from_object_list
 from data_operations.data_frame_printer import Data_Frame_Printer
 from analysis_operations.crosstab import Cross_Tab_Binary
 from analysis_operations.graph_functions import bar_chart
@@ -96,9 +96,9 @@ class Binary_Fields_Analysis:
         vector_dict = {}
 
         for field in binary_fields:
-            vector = build_nd_array_from_objects(object_list=self.patients,
-                                                 field_name=field,
-                                                 remove_missing_values=remove_missing_values)
+            vector, idx_to_remove = build_nd_array_from_object_list(object_list=self.patients,
+                                                                    field_name=field,
+                                                                    remove_missing_values=remove_missing_values)
             vector_dict[field] = vector
         self.vectors = vector_dict
 
