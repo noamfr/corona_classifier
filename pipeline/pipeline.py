@@ -1,7 +1,7 @@
-from get_data.data_reader import Data_Reader
+from data.data_reader import Data_Reader
 from missing_values.missing_values import Missing_Values
-from data.prep_data import Prep_Data
-from basic_analysis.basic_analysis import Basic_Analysis
+from prep_data.prep_data import Prep_Data
+from analysis.exploratory_analysis import Exploratory_Analysis
 
 
 class Pipeline:
@@ -22,9 +22,12 @@ class Pipeline:
         prep_data.prep_data()
         self.patients = prep_data.patients
 
-    def basic_analysis(self):
-        basic_analysis = Basic_Analysis(patients=self.patients)
-        basic_analysis.calc()
+    def build_vectors(self):
+        pass
+
+    def exploratory_analysis(self):
+        exploratory_analysis = Exploratory_Analysis(patients=self.patients)
+        exploratory_analysis.calc()
 
     def run_classification(self):
         pass

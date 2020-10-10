@@ -1,9 +1,10 @@
+import uuid
 from config.config import Config
 from analysis.age_analysis.age_groups import Age_Groups
 
 
 class Patient:
-    __slots__ = ['batch_date', 'test_name', 'swab_type', 'covid19_test_results', 'age',
+    __slots__ = ['id', 'batch_date', 'test_name', 'swab_type', 'covid19_test_results', 'age',
                  'high_risk_exposure_occupation', 'high_risk_interactions', 'diabetes', 'chd', 'htn', 'cancer',
                  'asthma', 'copd', 'autoimmune_dis', 'smoker', 'temperature', 'pulse', 'sys', 'dia', 'rr', 'sats',
                  'rapid_flu_results', 'rapid_strep_results', 'ctab', 'labored_respiration', 'rhonchi', 'wheezes',
@@ -12,6 +13,7 @@ class Patient:
                  'cxr_findings', 'cxr_impression', 'cxr_label', 'cxr_link', 'er_referral', 'source_file']
 
     def __init__(self, source_file):
+        self.id = str(uuid.uuid4())
         self.batch_date = None
         self.test_name = None
         self.swab_type = None
