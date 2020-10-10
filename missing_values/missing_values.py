@@ -3,27 +3,52 @@ import numpy as np
 import pandas as pd
 import os
 from collections import defaultdict
+from matplotlib import pyplot as plt
+
+from analysis_operations.graph_functions import histogram
+from analysis_operations.descriptive_table import Descriptive_Table
+
 from config.config import Config, Static_Configs
-from get_data.data_fields import Data_Fields
-from data.data_field_remover import Data_field_remover
+from data.data_fields import Data_Fields
+from prep_data.data_field_remover import Data_field_remover
+from data.patient import Patient
 
 
 class Missing_Values:
 
-    def __init__(self, patients: List):
+    def __init__(self, patients: List[Patient]):
         self.local_output_path = os.path.join(Config.OUTPUT_PATH, 'missing_values')
-        self.__data_fields = Data_Fields
         self.__patients = patients
         self.data_field_missing_values = None
 
     def remove_data_fields_with_to_much_missing_data(self):
+        self.__patient_missing_value_analysis()
         self.__source_files_missing_values_analysis()
         self.__data_field_missing_value_analysis()
         self.__remove_fields()
 
-    # def run_missing_value_analysis(self):
-    #     self.__source_files_missing_values_analysis()
-    #     self.__data_field_missing_value_analysis()
+    def __patient_missing_value_analysis(self):
+        missing_values_counter = defaultdict(int)
+
+        for patient in self.__patients:
+            for data_field in Data_Fields.get_all_data_fields():
+                if getattr(patient, data_field) is None:
+                    missing_values_counter[patient.id] += 1
+
+        patient_missing_values_vector = np.array([value for value in missing_values_counter.values()])
+
+        histogram(path=self.local_output_path,
+                  vector=patient_missing_values_vector,
+                  label='patient_missing_values',
+                  x_label='missing values count',
+                  y_label='count',
+                  bins=patient_missing_values_vector.max(),
+                  x_ticks=range(0, patient_missing_values_vector.max() + 2, 2),
+                  add_mean_line=True)
+
+        descriptive_table = Descriptive_Table({'patient_missing_value_vector': patient_missing_values_vector})
+        descriptive_table = pd.DataFrame(descriptive_table.get_descriptive_table())
+        descriptive_table.to_csv(os.path.join(self.local_output_path, 'patient_missing_values_descriptive.csv'))
 
     def __data_field_missing_value_analysis(self):
         missing_values_counter = dict(zip(Data_Fields.get_all_data_fields(),
@@ -70,10 +95,10 @@ class Missing_Values:
                 total_data_points_counter[source_file] = 0
                 missing_values_counter[source_file] = 0
 
-            for idx in range(len(patient.__slotnames__)):
+            for idx in range(len(patient.__slots__)):
                 total_data_points_counter[source_file] += 1
 
-                value = getattr(patient, patient.__slotnames__[idx])
+                value = getattr(patient, patient.__slots__[idx])
                 if value is None:
                     missing_values_counter[source_file] += 1
 
