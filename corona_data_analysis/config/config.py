@@ -1,6 +1,6 @@
 from os import path, listdir
 import yaml
-from typing import Dict, List
+from typing import Dict
 
 from .static_values import Static_Configs
 from .vitals_values import Vital_Values, Vitals_Container
@@ -24,8 +24,7 @@ class Config:
         __class__.PICKLE_PATH = path.join(Config.WORK_DIR, 'pickle_files')
         __class__.OUTPUT_PATH = path.join(Config.WORK_DIR, 'outputs')
         __class__.ADULT_AGE_THRESHOLD = Static_Configs.ADULT_AGE_THRESHOLD
-        __class__.ACCEPTED_VALUES_YAML_PATH = 'C:/Users/normy/PycharmProjects/corona_classifier/config/' \
-                                              'accepted_values_yamls'
+        __class__.ACCEPTED_VALUES_YAML_PATH = '/corona_data_analysis/config/accepted_values_yamls'
 
         # __class__.CHILDREN_HEALTHY_LOWER = self.load_vitals(file_name='children_healthy_lower')
         # __class__.CHILDREN_HEALTHY_UPPER = self.load_vitals(file_name='children_healthy_upper')

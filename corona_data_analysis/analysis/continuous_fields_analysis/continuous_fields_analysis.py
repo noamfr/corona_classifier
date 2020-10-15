@@ -4,14 +4,13 @@ import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt
 from typing import List, Dict
-from collections import defaultdict
 
 from ..analysis_vector import Analysis_Vector
 
 from data_operations.build_ndarray_from_objects import build_nd_array_from_object_list
 from analysis_operations.descriptive_table import Descriptive_Table
-from config.config import Config
-from data.data_fields import Data_Fields
+from corona_data_analysis.config.config import Config
+from corona_data_analysis.data.data_fields import Data_Fields
 
 
 class Continuous_Fields_Analysis:
