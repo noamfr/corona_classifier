@@ -9,8 +9,8 @@ from ..analysis_vector import Analysis_Vector
 
 from data_operations.build_ndarray_from_objects import build_nd_array_from_object_list
 from analysis_operations.descriptive_table import Descriptive_Table
-from corona_data_analysis.config.config import Config
-from corona_data_analysis.data.data_fields import Data_Fields
+from data_analysis.config.config import Config
+from data_analysis.data.data_fields import Data_Fields
 
 
 class Continuous_Fields_Analysis:

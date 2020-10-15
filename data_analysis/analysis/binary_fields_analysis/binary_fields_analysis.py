@@ -9,8 +9,8 @@ from data_operations.data_frame_printer import Data_Frame_Printer
 from analysis_operations.crosstab import Cross_Tab_Binary
 from analysis_operations.graph_functions import bar_chart
 
-from corona_data_analysis.config.config import Config
-from corona_data_analysis.data.data_fields import Data_Fields
+from data_analysis.config.config import Config
+from data_analysis.data.data_fields import Data_Fields
 
 
 class Binary_Fields_Analysis:
