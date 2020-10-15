@@ -1,5 +1,3 @@
-import os
-from config.config import Config
 from .binary_fields_analysis.binary_fields_analysis import Binary_Fields_Analysis
 from .age_analysis.age_analysis import Age_Analysis
 from .continuous_fields_analysis.continuous_fields_analysis import Continuous_Fields_Analysis

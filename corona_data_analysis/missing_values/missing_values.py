@@ -3,15 +3,14 @@ import numpy as np
 import pandas as pd
 import os
 from collections import defaultdict
-from matplotlib import pyplot as plt
 
 from analysis_operations.graph_functions import histogram
 from analysis_operations.descriptive_table import Descriptive_Table
 
-from config.config import Config, Static_Configs
-from data.data_fields import Data_Fields
-from prep_data.data_field_remover import Data_field_remover
-from data.patient import Patient
+from corona_data_analysis.config.config import Config, Static_Configs
+from corona_data_analysis.data.data_fields import Data_Fields
+from corona_data_analysis.prep_data.data_field_remover import Data_field_remover
+from corona_data_analysis.data.patient import Patient
 
 
 class Missing_Values:

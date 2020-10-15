@@ -3,8 +3,8 @@ import numpy as np
 from collections import defaultdict
 from typing import List
 
-from data.data_fields import Data_Fields
-from config.config import Config
+from corona_data_analysis.data.data_fields import Data_Fields
+from corona_data_analysis.config.config import Config
 
 
 class Prep_Data:
