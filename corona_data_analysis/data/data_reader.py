@@ -1,6 +1,6 @@
 import csv
 from os import listdir, path
-from corona_data_analysis.config.config import Config
+from config.config import Config
 from .patient import Patient
 from .data_fields import Data_Fields
 

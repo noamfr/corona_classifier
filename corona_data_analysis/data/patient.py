@@ -1,6 +1,6 @@
 import uuid
-from corona_data_analysis.config.config import Config
-from corona_data_analysis.analysis.age_analysis.age_groups import Age_Groups
+from config.config import Config
+from analysis.age_analysis.age_groups import Age_Groups
 
 
 class Patient:

@@ -6,7 +6,7 @@ from data_operations.data_frame_printer import Data_Frame_Printer
 from analysis_operations.descriptive_table import Descriptive_Table
 from analysis_operations.graph_functions import histogram
 
-from corona_data_analysis.config.config import Config
+from config.config import Config
 
 
 class Age_Analysis:

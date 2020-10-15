@@ -1,6 +1,6 @@
 from os import path, listdir
 import yaml
-from typing import Dict, List
+from typing import Dict
 
 from .static_values import Static_Configs
 from .vitals_values import Vital_Values, Vitals_Container
