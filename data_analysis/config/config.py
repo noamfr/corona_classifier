@@ -24,7 +24,7 @@ class Config:
         __class__.PICKLE_PATH = path.join(Config.WORK_DIR, 'pickle_files')
         __class__.OUTPUT_PATH = path.join(Config.WORK_DIR, 'outputs')
         __class__.ADULT_AGE_THRESHOLD = Static_Configs.ADULT_AGE_THRESHOLD
-        __class__.ACCEPTED_VALUES_YAML_PATH = '/data_analysis/config/accepted_values_yamls'
+        __class__.ACCEPTED_VALUES_YAML_PATH = 'config/accepted_values_yamls'
 
         # __class__.CHILDREN_HEALTHY_LOWER = self.load_vitals(file_name='children_healthy_lower')
         # __class__.CHILDREN_HEALTHY_UPPER = self.load_vitals(file_name='children_healthy_upper')

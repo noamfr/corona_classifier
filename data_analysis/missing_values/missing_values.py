@@ -9,7 +9,7 @@ from analysis_operations.descriptive_table import Descriptive_Table
 
 from config.config import Config, Static_Configs
 from data.data_fields import Data_Fields
-from prep_data.data_field_remover import Data_field_remover
+from .data_field_remover import Data_field_remover
 from data.patient import Patient
 
 

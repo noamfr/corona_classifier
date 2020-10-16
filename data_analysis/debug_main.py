@@ -1,4 +1,4 @@
-from pipeline.pipeline import Pipeline
+from pipeline import Pipeline
 from pipeline_operations.pipeline_executor import Pipeline_Executor
 from config.config import Config
 
@@ -12,10 +12,8 @@ if __name__ == '__main__':
 
     steps = [
         'get_data',
-        'treat_missing_values',
-        'prep_data',
-        'exploratory_analysis',
-        'run_classification'
+        'run_analysis',
+        'publish'
     ]
 
     pipeline_executor = Pipeline_Executor(pipeline_class=pipeline,
