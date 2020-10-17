@@ -10,9 +10,11 @@ class Config:
     WORK_DIR: str
     RAW_DATA_PATH: str
     PICKLE_PATH: str
-    OUTPUT_PATH: str
+    DATA_ANALYSIS_OUTPUTS_PATH: str
     ADULT_AGE_THRESHOLD: int
+    YAML_FILE_PATH: str
     ACCEPTED_VALUES_YAML_PATH: str
+    ANALYSIS_TABLE_NAMES: Dict
     CHILDREN_HEALTHY_LOWER: Dict
     CHILDREN_HEALTHY_UPPER: Dict
     VITALS_CONTAINER: Vitals_Container
@@ -22,16 +24,12 @@ class Config:
         __class__.WORK_DIR = 'C:/Users/normy/corona_classifier_files'
         __class__.RAW_DATA_PATH = 'C:/Users/normy/PycharmProjects/covidclinicaldata/data'
         __class__.PICKLE_PATH = path.join(Config.WORK_DIR, 'pickle_files')
-        __class__.OUTPUT_PATH = path.join(Config.WORK_DIR, 'outputs')
+        __class__.DATA_ANALYSIS_OUTPUTS_PATH = path.join(Config.WORK_DIR, 'data_analysis_outputs')
         __class__.ADULT_AGE_THRESHOLD = Static_Configs.ADULT_AGE_THRESHOLD
+        __class__.YAML_FILE_PATH = 'config/yaml_files'
+
         __class__.ACCEPTED_VALUES_YAML_PATH = 'config/accepted_values_yamls'
-
-        # __class__.CHILDREN_HEALTHY_LOWER = self.load_vitals(file_name='children_healthy_lower')
-        # __class__.CHILDREN_HEALTHY_UPPER = self.load_vitals(file_name='children_healthy_upper')
-        # __class__.ADULTS_HEALTHY_LOWER = self.load_vitals(file_name='adults_healthy_lower')
-        # __class__.ADULTS_HEALTHY_UPPER = self.load_vitals(file_name='adults_healthy_upper')
-
-        __class__.VITALS_CONTAINER = self.build_vitals_container()
+        __class__.ANALYSIS_TABLE_NAMES = self.load_yaml('analysis_table_names')
 
     @classmethod
     def get_missing_value_threshold(cls):
@@ -39,7 +37,7 @@ class Config:
 
     @staticmethod
     def load_yaml(file_name):
-        with open(path.join(Config.ACCEPTED_VALUES_YAML_PATH, f'{file_name}'), 'r') as data:
+        with open(path.join(Config.YAML_FILE_PATH, f'{file_name}.yaml'), 'r') as data:
             data_loaded = yaml.safe_load(data)
         return data_loaded
 

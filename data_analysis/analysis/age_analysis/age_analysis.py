@@ -30,7 +30,7 @@ class Age_Analysis:
 
     def __print_results(self):
         data_frame_printer = Data_Frame_Printer(path=self.local_output_path)
-        data_frame_printer.print_df_from_defaultdict(self.age_descriptive_table, 'age_descriptive_table')
+        data_frame_printer.print_df_from_dict(self.age_descriptive_table, 'age_descriptive_table')
 
     def __generate_age_vectors(self):
         all_ages = np.array([patient.age for patient in self.patients])

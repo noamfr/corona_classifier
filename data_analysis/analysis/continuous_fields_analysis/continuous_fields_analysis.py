@@ -9,36 +9,31 @@ from ..analysis_vector import Analysis_Vector
 
 from data_operations.build_ndarray_from_objects import build_nd_array_from_object_list
 from analysis_operations.descriptive_table import Descriptive_Table
-from data_analysis.config.config import Config
 from data_analysis.data.data_fields import Data_Fields
 
 
 class Continuous_Fields_Analysis:
-    def __init__(self, patients: List, publish_results: bool):
+    def __init__(self, patients: List):
         self.patients = patients
-        self.publish_results = publish_results
-        self.local_output_path = os.path.join(Config.OUTPUT_PATH, 'continuous_fields_analysis')
         self.vectors: Dict[str: np.ndarray]
         self.missing_value_idx_for_vectors: Dict
-
-        self.descriptive_table = None
+        self.report_tables: Dict = {}
 
         self.__build_vectors(remove_missing_values=True)
+        self.__run_analysis()
 
-    def run_analysis(self):
+    def __run_analysis(self):
         self.__descriptive_table()
         self.__correlation_matrix()
         self.__average_by_target()
-
-        if self.publish_results:
-            self.__publish_results_to_file()
+        self.__continuous_fields_quality()
 
     def __descriptive_table(self):
         vector_dict = dict(zip([getattr(vector, 'field_name') for vector in self.vectors],
                                [getattr(vector, 'vector') for vector in self.vectors]))
 
         descriptive_table = Descriptive_Table(vector_dict=vector_dict)
-        self.descriptive_table = descriptive_table.get_descriptive_table()
+        self.report_tables['descriptive_table'] = descriptive_table.get_descriptive_table()
 
     def __correlation_matrix(self):
         same_length_vectors = self.__get_same_length_vectors()
@@ -56,7 +51,10 @@ class Continuous_Fields_Analysis:
         plt.savefig(os.path.join(self.local_output_path, 'correlation_matrix.png'))
 
     def __average_by_target(self):
-        continuous_fields = Data_Fields.get_continuous_vars()
+        pass
+
+    def __continuous_fields_quality(self):
+        pass
 
     def __build_vectors(self, remove_missing_values: bool):
         continuous_fields = Data_Fields.get_continuous_vars()
@@ -102,8 +100,3 @@ class Continuous_Fields_Analysis:
             same_length_vectors[field] = vector
 
         return same_length_vectors
-
-
-    def __publish_results_to_file(self):
-        descriptive_table_df = pd.DataFrame(self.descriptive_table)
-        descriptive_table_df.to_csv(os.path.join(self.local_output_path, 'descriptive_table.csv'))

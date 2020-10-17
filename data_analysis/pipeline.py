@@ -1,11 +1,13 @@
 from data.data import Data
 from analysis.analysis import Analysis
+from publish.file_saver import File_Saver
 
 
 class Pipeline:
     def __init__(self):
         self.data: Data or None = None
         self.analysis: Analysis or None = None
+        self.file_saver: File_Saver or None = None
 
     def get_data(self):
         self.data = Data()
@@ -14,4 +16,4 @@ class Pipeline:
         self.analysis = Analysis(data=self.data)
 
     def publish(self):
-        pass
+        self.file_saver = File_Saver(analysis=self.analysis)
