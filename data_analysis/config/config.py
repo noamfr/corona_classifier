@@ -14,7 +14,6 @@ class Config:
     ADULT_AGE_THRESHOLD: int
     YAML_FILE_PATH: str
     ACCEPTED_VALUES_YAML_PATH: str
-    ANALYSIS_TABLE_NAMES: Dict
     CHILDREN_HEALTHY_LOWER: Dict
     CHILDREN_HEALTHY_UPPER: Dict
     VITALS_CONTAINER: Vitals_Container
@@ -29,7 +28,6 @@ class Config:
         __class__.YAML_FILE_PATH = 'config/yaml_files'
 
         __class__.ACCEPTED_VALUES_YAML_PATH = 'config/accepted_values_yamls'
-        __class__.ANALYSIS_TABLE_NAMES = self.load_yaml('analysis_table_names')
 
     @classmethod
     def get_missing_value_threshold(cls):

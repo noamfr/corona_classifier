@@ -34,7 +34,7 @@ class Binary_Fields_Analysis:
     def __calc_frequency_table(self):
         self.__build_vectors(remove_missing_values=True)
 
-        data_dict = defaultdict(list)
+        report_dict = defaultdict(list)
         for field in self.__vectors:
             positive_percent = self.__vectors[field].mean()
             negative_percent = 1 - positive_percent
@@ -44,14 +44,14 @@ class Binary_Fields_Analysis:
             negative_count = total_patients * negative_percent
             missing_count = len(self.__patients) - total_patients
 
-            data_dict['data_field'].append(field)
-            data_dict['positive_percent'].append(positive_percent)
-            data_dict['negative_percent'].append(negative_percent)
-            data_dict['positive_count'].append(positive_count)
-            data_dict['negative_count'].append(negative_count)
-            data_dict['missing_count'].append(missing_count)
+            report_dict['data_field'].append(field)
+            report_dict['positive_percent'].append(positive_percent)
+            report_dict['negative_percent'].append(negative_percent)
+            report_dict['positive_count'].append(positive_count)
+            report_dict['negative_count'].append(negative_count)
+            report_dict['missing_count'].append(missing_count)
 
-        self.__report_tables['binary_fields_frequency_table'] = data_dict
+        self.__report_tables['binary_fields_frequency_table'] = report_dict
 
     def __calc_binary_fields_by_target(self):
         self.__build_vectors(remove_missing_values=False)

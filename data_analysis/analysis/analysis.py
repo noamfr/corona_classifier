@@ -4,6 +4,7 @@ from .age_analysis.age_analysis import Age_Analysis
 from .binary_fields_analysis.binary_fields_analysis import Binary_Fields_Analysis
 from .continuous_fields_analysis.continuous_fields_analysis import Continuous_Fields_Analysis
 from data.data import Data
+from .missing_values_analysis.missing_values_analysis import Missing_Values_Analysis
 
 
 class Analysis:
@@ -14,9 +15,14 @@ class Analysis:
         self.__calc()
 
     def __calc(self):
+        self.__missing_values_analysis()
         self.__binary_fields_analysis()
         # self.__continuous_fields_analysis()
         # self.__age_analysis()
+
+    def __missing_values_analysis(self):
+        missing_values_analysis = Missing_Values_Analysis(patients=self.__patients)
+        self.__report_tables = {**self.__report_tables, **missing_values_analysis.get_report_tables}
 
     def __binary_fields_analysis(self):
         binary_fields_analysis = Binary_Fields_Analysis(patients=self.__patients)
