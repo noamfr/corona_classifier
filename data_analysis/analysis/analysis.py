@@ -1,3 +1,4 @@
+from numpy import ndarray
 from typing import Dict
 
 from .age_analysis.age_analysis import Age_Analysis
@@ -11,6 +12,7 @@ class Analysis:
     def __init__(self, data: Data):
         self.__patients = data.patients
         self.__report_tables: Dict = {}
+        self.__graph_vectors: Dict[str: ndarray] = {}
 
         self.__calc()
 
@@ -23,6 +25,7 @@ class Analysis:
     def __missing_values_analysis(self):
         missing_values_analysis = Missing_Values_Analysis(patients=self.__patients)
         self.__report_tables = {**self.__report_tables, **missing_values_analysis.get_report_tables}
+        self.__graph_vectors = {**self.__graph_vectors, **missing_values_analysis.get_graph_vectors}
 
     def __binary_fields_analysis(self):
         binary_fields_analysis = Binary_Fields_Analysis(patients=self.__patients)
@@ -38,3 +41,7 @@ class Analysis:
     @property
     def get_report_tables(self):
         return self.__report_tables
+
+    @property
+    def get_graph_vectors(self):
+        return self.__graph_vectors

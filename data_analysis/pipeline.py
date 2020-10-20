@@ -15,5 +15,5 @@ class Pipeline:
     def run_analysis(self):
         self.analysis = Analysis(data=self.data)
 
-    def publish(self):
+    def save_outputs_to_file(self):
         self.file_saver = File_Saver(analysis=self.analysis)

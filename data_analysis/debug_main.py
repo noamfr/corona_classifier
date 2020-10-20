@@ -13,7 +13,7 @@ if __name__ == '__main__':
     steps = [
         'get_data',
         'run_analysis',
-        'publish'
+        'save_outputs_to_file'
     ]
 
     pipeline_executor = Pipeline_Executor(pipeline_class=pipeline,
