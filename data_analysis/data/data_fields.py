@@ -2,6 +2,7 @@ from enum import Enum
 
 
 class Data_Classes:
+    TARGET = 'target'
     BINARY = 'binary'
     CATEGORICAL = 'categorical'
     CONTINUOUS = 'continuous'
@@ -13,7 +14,7 @@ class Data_Fields(Enum):
     BATCH_DATE = ('batch_date', Data_Classes.CATEGORICAL, True)
     TEST_NAME = ('test_name', Data_Classes.CATEGORICAL, True)
     SWAB_TYPE = ('swab_type', Data_Classes.CATEGORICAL, True)
-    COVID19_TEST_RESULTS = ('covid19_test_results', Data_Classes.BINARY, True)
+    COVID19_TEST_RESULTS = ('covid19_test_results', Data_Classes.TARGET, True)
     AGE = ('age', Data_Classes.CONTINUOUS, True)
     HIGH_RISK_EXPOSURE_OCCUPATION = ('high_risk_exposure_occupation', Data_Classes.BINARY, True)
     HIGH_RISK_INTERACTIONS = ('high_risk_interactions', Data_Classes.BINARY, True)
