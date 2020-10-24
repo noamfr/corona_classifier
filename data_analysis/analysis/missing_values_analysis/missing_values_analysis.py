@@ -90,9 +90,9 @@ class Missing_Values_Analysis:
             active_data_points_percent = 1 - null_percent
 
             report_dict['data_field'].append(data_field)
-            report_dict['null_count'].append(null_count)
-            report_dict['active_data_points_count'].append(active_data_points_count)
-            report_dict['null_percent'].append(null_percent)
+            report_dict['missing_data_count'].append(null_count)
+            report_dict['active_data_count'].append(active_data_points_count)
+            report_dict['missing_data_percent'].append(null_percent)
             report_dict['active_data_percent'].append(active_data_points_percent)
 
         self.__report_tables['data_field_missing_values_analysis'] = report_dict
