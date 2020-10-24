@@ -3,46 +3,43 @@ from typing import List, Dict
 from collections import defaultdict
 
 from data_operations.build_ndarray_from_objects import build_nd_array_from_object_list
+from data.vector_builder import Analysis_Vector
 from analysis_operations.crosstab import Cross_Tab_Binary
 
 from data_analysis.data.data_fields import Data_Fields
 
 
 class Binary_Fields_Analysis:
-    def __init__(self, patients: List):
+    def __init__(self, patients: List, vectors):
         self.__patients = patients
-        self.__vectors: Dict[str: np.ndarray]
+        self.__vectors: Dict[str: Analysis_Vector] = vectors
         self.__report_tables: Dict = {}
 
+        self.__get_vectors_for_analysis()
         self.__run_analysis()
 
     def __run_analysis(self):
-        # self.__calc_binary_unique_values()
         self.__calc_frequency_table()
         # self.__calc_binary_fields_by_target()
 
-    def __calc_binary_unique_values(self):
-        binary_data_fields = Data_Fields.get_binary_vars()
-        binary_vars_unique_values = defaultdict(set)
-        for patient in self.__patients:
-            for field in binary_data_fields:
-                value = getattr(patient, field)
-                binary_vars_unique_values[field].add(value)
-
-        self.__report_tables['binary_vars_unique_values'] = binary_vars_unique_values
+    def __get_vectors_for_analysis(self):
+        vectors_for_analysis = self.__vectors['target']
+        vectors_for_analysis.update(self.__vectors['binary_vectors'])
+        self.__vectors = vectors_for_analysis
 
     def __calc_frequency_table(self):
-        self.__build_vectors(remove_missing_values=True)
-
         report_dict = defaultdict(list)
+
         for field in self.__vectors:
-            positive_percent = self.__vectors[field].mean()
+            vector = self.__vectors[field].get_vector_without_missing_values()
+
+            positive_percent = vector.mean()
             negative_percent = 1 - positive_percent
 
-            total_patients = len(self.__vectors[field])
+            total_patients = len(vector)
             positive_count = total_patients * positive_percent
             negative_count = total_patients * negative_percent
-            missing_count = len(self.__patients) - total_patients
+            missing_count = len(self.__vectors[field].vector) - total_patients
 
             report_dict['data_field'].append(field)
             report_dict['positive_percent'].append(positive_percent)
@@ -97,3 +94,14 @@ class Binary_Fields_Analysis:
                                                                     remove_missing_values=remove_missing_values)
             vector_dict[field] = vector
         self.__vectors = vector_dict
+
+    # function for calculating binary unique values for one hot encoding
+    def __calc_binary_unique_values(self):
+        binary_data_fields = Data_Fields.get_binary_vars()
+        binary_vars_unique_values = defaultdict(set)
+        for patient in self.__patients:
+            for field in binary_data_fields:
+                value = getattr(patient, field)
+                binary_vars_unique_values[field].add(value)
+
+        self.__report_tables['binary_vars_unique_values'] = binary_vars_unique_values
