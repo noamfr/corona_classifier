@@ -5,40 +5,60 @@ import seaborn as sns
 from matplotlib import pyplot as plt
 from typing import List, Dict
 
-from ..analysis_vector import Analysis_Vector
-
-from data_operations.build_ndarray_from_objects import build_nd_array_from_object_list
 from analysis_operations.descriptive_table import Descriptive_Table
-from data_analysis.config.config import Config
+
 from data_analysis.data.data_fields import Data_Fields
+from data.vector_builder import Analysis_Vector
+from config.config import Config
 
 
 class Continuous_Fields_Analysis:
-    def __init__(self, patients: List, publish_results: bool):
-        self.patients = patients
-        self.publish_results = publish_results
-        self.local_output_path = os.path.join(Config.OUTPUT_PATH, 'continuous_fields_analysis')
-        self.vectors: Dict[str: np.ndarray]
-        self.missing_value_idx_for_vectors: Dict
+    def __init__(self, patients: List, vectors: List[Analysis_Vector]):
+        self.__patients = patients
+        self.__vectors = vectors
+        self.__report_tables: Dict = {}
+        self.__graph_vectors: Dict = {}
 
-        self.descriptive_table = None
+        self.__get_vectors_for_analysis()
+        self.__run_analysis()
 
-        self.__build_vectors(remove_missing_values=True)
-
-    def run_analysis(self):
+    def __run_analysis(self):
         self.__descriptive_table()
-        self.__correlation_matrix()
+        # self.__correlation_matrix()
         self.__average_by_target()
+        self.__continuous_fields_quality()
 
-        if self.publish_results:
-            self.__publish_results_to_file()
+    def __get_vectors_for_analysis(self):
+        data_fields_for_analysis = [Data_Fields.get_target()]
+        data_fields_for_analysis.extend(Data_Fields.get_continuous_vars())
+
+        vectors_for_analysis = []
+        for vector in self.__vectors:
+            if vector.field_name in data_fields_for_analysis:
+                if vector.field_name in Config.DATA_FIELDS_IN_ANALYSIS:
+                    vectors_for_analysis.append(vector)
+
+        self.__vectors = vectors_for_analysis
+        self.__graph_vectors['continuous_vectors'] = self.__vectors
 
     def __descriptive_table(self):
-        vector_dict = dict(zip([getattr(vector, 'field_name') for vector in self.vectors],
-                               [getattr(vector, 'vector') for vector in self.vectors]))
-
+        vector_dict = self.__get_vector_dict(remove_missing_values=True)
         descriptive_table = Descriptive_Table(vector_dict=vector_dict)
-        self.descriptive_table = descriptive_table.get_descriptive_table()
+        self.__report_tables['descriptive_table'] = descriptive_table.get_descriptive_table()
+
+    def __get_vector_dict(self, remove_missing_values: bool):
+        vector_dict = {}
+        for analysis_vector in self.__vectors:
+            field_name = analysis_vector.field_name
+            if field_name == Data_Fields.get_target():
+                continue
+
+            if remove_missing_values:
+                vector = analysis_vector.vector_without_missing_values
+            else:
+                vector = analysis_vector.vector
+            vector_dict[field_name] = vector
+        return vector_dict
 
     def __correlation_matrix(self):
         same_length_vectors = self.__get_same_length_vectors()
@@ -55,55 +75,33 @@ class Continuous_Fields_Analysis:
         plt.tight_layout()
         plt.savefig(os.path.join(self.local_output_path, 'correlation_matrix.png'))
 
-    def __average_by_target(self):
-        continuous_fields = Data_Fields.get_continuous_vars()
-
-    def __build_vectors(self, remove_missing_values: bool):
-        continuous_fields = Data_Fields.get_continuous_vars()
-        vectors = []
-        missing_value_idx_for_vectors = {}
-
-        for field in continuous_fields:
-            vector, missing_value_idx = build_nd_array_from_object_list(object_list=self.patients,
-                                                                        field_name=field,
-                                                                        remove_missing_values=remove_missing_values)
-
-            vector = Analysis_Vector(field_name=field, vector=vector, missing_value_idx=missing_value_idx)
-            vectors.append(vector)
-            missing_value_idx_for_vectors[field] = missing_value_idx
-
-        self.vectors = vectors
-        self.missing_value_idx_for_vectors = missing_value_idx_for_vectors
-
-    def __get_aggregated_missing_idx(self):
-        aggregated_missing_idx = set()
-        for vector in self.missing_value_idx_for_vectors:
-            aggregated_missing_idx.update(self.missing_value_idx_for_vectors[vector])
-
-        return aggregated_missing_idx
-
     def __get_same_length_vectors(self):
-        continuous_fields = Data_Fields.get_continuous_vars()
-        # continuous_fields.remove('days_since_symptom_onset')
-
-        vectors = {}
-
-        for field in continuous_fields:
-            vector, missing_value_idx = build_nd_array_from_object_list(object_list=self.patients,
-                                                                        field_name=field,
-                                                                        remove_missing_values=False)
-            vectors[field] = vector
-
         same_length_vectors = {}
-        aggregated_missing_idx = list(self.__get_aggregated_missing_idx())
+        aggregated_missing_idx = self.__get_aggregated_missing_idx()
 
-        for field in vectors:
-            vector = np.delete(vectors[field], aggregated_missing_idx)
-            same_length_vectors[field] = vector
+        for analysis_vector in self.__vectors:
+            same_length_vector = np.delete(analysis_vector.vector, aggregated_missing_idx)
+            same_length_vectors[analysis_vector.field_name] = same_length_vector
 
         return same_length_vectors
 
+    def __get_aggregated_missing_idx(self):
+        aggregated_missing_idx = set()
+        for vector in self.__vectors:
+            aggregated_missing_idx.update(vector.missing_values_idx)
 
-    def __publish_results_to_file(self):
-        descriptive_table_df = pd.DataFrame(self.descriptive_table)
-        descriptive_table_df.to_csv(os.path.join(self.local_output_path, 'descriptive_table.csv'))
+        return aggregated_missing_idx
+
+    def __average_by_target(self):
+        pass
+
+    def __continuous_fields_quality(self):
+        pass
+
+    @property
+    def get_report_tables(self):
+        return self.__report_tables
+
+    @property
+    def get_graph_vectors(self):
+        return self.__graph_vectors

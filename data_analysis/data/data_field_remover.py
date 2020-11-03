@@ -7,6 +7,8 @@ class Data_field_remover:
         self.fields_to_remove = fields_to_remove
         self.data_field_class = data_field_class
 
-    def remove_date_fields(self):
+        self.__remove_date_fields()
+
+    def __remove_date_fields(self):
         for field in self.fields_to_remove:
             getattr(self.data_field_class, field.upper()).in_analysis = False
