@@ -26,6 +26,7 @@ class File_Saver:
                                           file_name=table_name)
 
     def __save_graphs_to_file(self):
+
         bar_chart(x=self.__report_tables['source_files_missing_values_analysis']['source_file'],
                   height=self.__report_tables['source_files_missing_values_analysis']['missing_values_percent'],
                   title='Source_files_missing_values_%',
@@ -34,7 +35,7 @@ class File_Saver:
                   path=Config.DATA_ANALYSIS_OUTPUTS_PATH)
 
         bar_chart(x=self.__report_tables['data_field_missing_values_analysis']['data_field'],
-                  height=self.__report_tables['data_field_missing_values_analysis']['null_percent'],
+                  height=self.__report_tables['data_field_missing_values_analysis']['missing_data_percent'],
                   title='Data_fields_missing_values_%',
                   x_label='Data_fields',
                   y_label='missing_values_%',
@@ -49,3 +50,13 @@ class File_Saver:
                   bins=vector.max(),
                   x_ticks=range(0, vector.max() + 2, 2),
                   add_mean_line=True)
+
+        for analysis_vector in self.__graph_vectors['continuous_vectors']:
+            histogram(path=Config.DATA_ANALYSIS_OUTPUTS_PATH,
+                      vector=analysis_vector.vector_without_missing_values,
+                      label=analysis_vector.field_name,
+                      x_label=analysis_vector.field_name,
+                      y_label='count',
+                      bins=50,
+                      x_ticks=range(0, int(analysis_vector.vector_without_missing_values.max()) + 2, 2),
+                      add_mean_line=True)

@@ -1,32 +1,39 @@
-from typing import List, Dict
+from typing import List
 
 from .data_reader import Data_Reader
-from .vector_builder import Vector_Builder
-from .patient import Patient
+from .data_field_remover import Data_field_remover
 from .data_fields import Data_Fields
+from .patient import Patient
+from .vector_builder import Vector_Builder, Analysis_Vector
+from config.config import Config
 
 
 class Data:
-    def __init__(self):
-        self.patients: List[Patient] = []
-        self.vectors: Dict = {}
+    def __init__(self, remove_missing_values=False):
+        self.__remove_missing_values = remove_missing_values
+        self.__patients: List[Patient] = []
+        self.__vectors: List[Analysis_Vector] = []
 
         self.__calc()
 
     def __calc(self):
-        self.__get_patients()
-        self.__one_hot_encoding()
-        self.__build_vectors()
+        self.__fetch_patients()
+        self.__binary_one_hot_encoding()
+        self.__build_analysis_vectors()
 
-    def __get_patients(self):
+        if self.__remove_missing_values:
+            self.__remove_data_fields_with_to_much_missing_data()
+
+    def __fetch_patients(self):
         data_reader = Data_Reader()
-        self.patients = data_reader.get_patients()
+        self.__patients = data_reader.get_patients()
 
-    def __one_hot_encoding(self):
-        binary_data_fields = Data_Fields.get_binary_vars()
+    def __binary_one_hot_encoding(self):
+        data_fields = Data_Fields.get_binary_vars()
+        data_fields.append(Data_Fields.get_target())
 
-        for patient in self.patients:
-            for field in binary_data_fields:
+        for patient in self.__patients:
+            for field in data_fields:
                 if getattr(patient, field) is None:
                     continue
                 elif getattr(patient, field) not in ('TRUE', 'Positive'):
@@ -34,28 +41,26 @@ class Data:
                 else:
                     setattr(patient, field, 1)
 
-    def __build_vectors(self):
-        self.__build_target_vector()
-        self.__build_binary_vectors()
-        self.__build_continuous_vectors()
+    def __build_analysis_vectors(self):
+        vector_builder = Vector_Builder(data_object_list=self.__patients,
+                                        data_fields=Data_Fields.get_all_data_fields())
 
-    def __build_target_vector(self):
-        vector_builder = Vector_Builder(data_object_list=self.patients,
-                                        data_fields=Data_Fields.get_target(),
-                                        array_type=int)
+        self.__vectors = vector_builder.analysis_vectors
 
-        self.vectors['target'] = vector_builder.analysis_vectors
+    def __remove_data_fields_with_to_much_missing_data(self):
+        for analysis_vector in self.__vectors:
+            data_field_name = analysis_vector.field_name
+            all_data_points_count = analysis_vector.get_vector_size
+            missing_values_count = analysis_vector.get_missing_values_count
+            missing_value_ratio = missing_values_count / all_data_points_count
 
-    def __build_binary_vectors(self):
-        vector_builder = Vector_Builder(data_object_list=self.patients,
-                                        data_fields=Data_Fields.get_binary_vars(),
-                                        array_type=int)
+            if missing_value_ratio > Config.DATA_FIELD_MISSING_VALUES_THRESHOLD:
+                Config.DATA_FIELDS_IN_ANALYSIS.remove(data_field_name)
 
-        self.vectors['binary_vectors'] = vector_builder.analysis_vectors
+    @property
+    def get_patients(self):
+        return self.__patients
 
-    def __build_continuous_vectors(self):
-        vector_builder = Vector_Builder(data_object_list=self.patients,
-                                        data_fields=Data_Fields.get_continuous_vars(),
-                                        array_type=float)
-
-        self.vectors['continuous_vectors'] = vector_builder.analysis_vectors
+    @property
+    def get_vectors(self):
+        return self.__vectors

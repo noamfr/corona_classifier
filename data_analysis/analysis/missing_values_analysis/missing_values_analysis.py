@@ -3,6 +3,7 @@ from collections import defaultdict
 from typing import List, Dict
 
 from analysis_operations.descriptive_table import Descriptive_Table
+from config.config import Config
 
 from data.data_fields import Data_Fields
 from data.patient import Patient
@@ -110,3 +111,13 @@ class Missing_Values_Analysis:
 
         self.__report_tables['patient_missing_values_analysis'] = descriptive_table.get_descriptive_table()
         self.__graph_vectors['patient_missing_values'] = patient_missing_values_vector
+
+    def __remove_data_fields_with_to_much_missing_values(self):
+        data_dict = self.__report_tables['data_field_missing_values_analysis']
+
+        for idx in range(len(data_dict['data_field'])):
+            data_field = data_dict['data_field']
+            missing_data_percent = data_dict['missing_data_percent']
+
+            if missing_data_percent > Config.DATA_FIELD_MISSING_VALUES_THRESHOLD:
+                Config.DATA_FIELDS_IN_ANALYSIS.remove(data_field)

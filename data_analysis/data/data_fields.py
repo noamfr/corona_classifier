@@ -4,8 +4,8 @@ from enum import Enum
 class Data_Classes:
     TARGET = 'target'
     BINARY = 'binary'
-    CATEGORICAL = 'categorical'
     CONTINUOUS = 'continuous'
+    CATEGORICAL = 'categorical'
     TEXT = 'text'
     NOT_IN_USE = 'not_in_use'
 
@@ -69,11 +69,6 @@ class Data_Fields(Enum):
         return Data_Fields.COVID19_TEST_RESULTS.field_name
 
     @classmethod
-    def get_features(cls):
-        return [Data_Fields.AGE.field_name,
-                Data_Fields.PULSE.field_name]
-
-    @classmethod
     def get_binary_vars(cls):
         binary_vars = []
         for var_name in Data_Fields.get_all_data_fields():
@@ -90,6 +85,15 @@ class Data_Fields(Enum):
                     getattr(Data_Fields, var_name.upper()).in_analysis:
                 continuous_vars.append(var_name)
         return continuous_vars
+
+    @classmethod
+    def get_all_data_fields_for_analysis(cls):
+        data_fields_for_analysis = set()
+        for data_field in cls.get_all_data_fields():
+            if getattr(Data_Fields, data_field.upper()).in_analysis:
+                data_fields_for_analysis.add(data_field)
+
+        return data_fields_for_analysis
 
     @classmethod
     def get_all_data_fields(cls):

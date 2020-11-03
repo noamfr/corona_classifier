@@ -10,7 +10,7 @@ class Pipeline:
         self.file_saver: File_Saver or None = None
 
     def get_data(self):
-        self.data = Data()
+        self.data = Data(remove_missing_values=True)
 
     def run_analysis(self):
         self.analysis = Analysis(data=self.data)

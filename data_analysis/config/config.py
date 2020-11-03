@@ -1,7 +1,8 @@
 from os import path, listdir
 import yaml
-from typing import Dict
+from typing import Dict, Set
 
+from data.data_fields import Data_Fields
 from .static_values import Static_Configs
 from .vitals_values import Vital_Values, Vitals_Container
 
@@ -11,6 +12,8 @@ class Config:
     RAW_DATA_PATH: str
     PICKLE_PATH: str
     DATA_ANALYSIS_OUTPUTS_PATH: str
+    DATA_FIELDS_IN_ANALYSIS: Set[str]
+    DATA_FIELD_MISSING_VALUES_THRESHOLD: float
     ADULT_AGE_THRESHOLD: int
     YAML_FILE_PATH: str
     ACCEPTED_VALUES_YAML_PATH: str
@@ -24,10 +27,16 @@ class Config:
         __class__.RAW_DATA_PATH = 'C:/Users/normy/PycharmProjects/covidclinicaldata/data'
         __class__.PICKLE_PATH = path.join(Config.WORK_DIR, 'pickle_files')
         __class__.DATA_ANALYSIS_OUTPUTS_PATH = path.join(Config.WORK_DIR, 'data_analysis_outputs')
+        __class__.DATA_FIELDS_IN_ANALYSIS = set(Data_Fields.get_all_data_fields())
+        __class__.DATA_FIELD_MISSING_VALUES_THRESHOLD = 0.7
         __class__.ADULT_AGE_THRESHOLD = Static_Configs.ADULT_AGE_THRESHOLD
         __class__.YAML_FILE_PATH = 'config/yaml_files'
 
         __class__.ACCEPTED_VALUES_YAML_PATH = 'config/accepted_values_yamls'
+
+    @classmethod
+    def remove_data_field_from_analysis(cls, data_field: str):
+        cls.DATA_FIELDS_IN_ANALYSIS.remove(data_field)
 
     @classmethod
     def get_missing_value_threshold(cls):
