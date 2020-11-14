@@ -1,21 +1,20 @@
 import csv
 from os import listdir, path
-from config.config import Config
 from .patient import Patient
 from .data_fields import Data_Fields
 
 
 class Data_Reader:
-    def __init__(self):
+    def __init__(self, raw_data_path: str):
         self.patients = []
+        self.raw_data_path = raw_data_path
 
-    @staticmethod
-    def get_patients():
+    def get_patients(self):
         all_data_fields = Data_Fields.get_all_data_fields()
         patients = []
 
-        for file_name in listdir(Config.RAW_DATA_PATH):
-            reader = csv.DictReader(open(path.join(Config.RAW_DATA_PATH, file_name)))
+        for file_name in listdir(self.raw_data_path):
+            reader = csv.DictReader(open(path.join(self.raw_data_path, file_name)))
 
             for row in reader:
                 patient = Patient(source_file=file_name)

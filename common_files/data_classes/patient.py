@@ -1,6 +1,5 @@
 import uuid
-from config.config import Config
-from analysis.age_analysis.age_groups import Age_Groups
+from .age_groups import Age_Groups
 
 
 class Patient:
@@ -64,7 +63,7 @@ class Patient:
 
     @property
     def is_adult(self):
-        if int(self.age) < Config.ADULT_AGE_THRESHOLD:
+        if int(self.age) < 18:
             return 0
 
         else:

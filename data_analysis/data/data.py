@@ -1,10 +1,11 @@
 from typing import List
 
-from .data_reader import Data_Reader
-from .data_fields import Data_Fields
-from .patient import Patient
-from .vector_builder import Vector_Builder, Analysis_Vector
-from config.config import Config
+from data_classes.data_reader import Data_Reader
+from data_classes.data_fields import Data_Fields
+from data_classes.patient import Patient
+from data_classes.analysis_vector import Analysis_Vector_Builder, Analysis_Vector
+
+from config.analysis_config import Analysis_Config
 
 
 class Data:
@@ -24,7 +25,7 @@ class Data:
             self.__remove_data_fields_with_to_much_missing_data()
 
     def __fetch_patients(self):
-        data_reader = Data_Reader()
+        data_reader = Data_Reader(raw_data_path=Analysis_Config.RAW_DATA_PATH)
         self.__patients = data_reader.get_patients()
 
     def __binary_one_hot_encoding(self):
@@ -41,8 +42,8 @@ class Data:
                     setattr(patient, field, 1)
 
     def __build_analysis_vectors(self):
-        vector_builder = Vector_Builder(data_object_list=self.__patients,
-                                        data_fields=Data_Fields.get_all_data_fields())
+        vector_builder = Analysis_Vector_Builder(data_object_list=self.__patients,
+                                                 data_fields=Data_Fields.get_all_data_fields())
 
         self.__vectors = vector_builder.analysis_vectors
 
@@ -53,8 +54,8 @@ class Data:
             missing_values_count = analysis_vector.get_missing_values_count
             missing_value_ratio = missing_values_count / all_data_points_count
 
-            if missing_value_ratio > Config.DATA_FIELD_MISSING_VALUES_THRESHOLD:
-                Config.DATA_FIELDS_IN_ANALYSIS.remove(data_field_name)
+            if missing_value_ratio > Analysis_Config.DATA_FIELD_MISSING_VALUES_THRESHOLD:
+                Analysis_Config.DATA_FIELDS_IN_ANALYSIS.remove(data_field_name)
 
     @property
     def get_patients(self):

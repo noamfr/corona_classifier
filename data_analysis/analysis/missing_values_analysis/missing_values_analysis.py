@@ -3,10 +3,10 @@ from collections import defaultdict
 from typing import List, Dict
 
 from analysis_operations.descriptive_table import Descriptive_Table
-from config.config import Config
+from config.analysis_config import Analysis_Config
 
-from data.data_fields import Data_Fields
-from data.patient import Patient
+from data_classes.data_fields import Data_Fields
+from data_classes.patient import Patient
 
 
 class Missing_Values_Analysis:
@@ -119,5 +119,5 @@ class Missing_Values_Analysis:
             data_field = data_dict['data_field']
             missing_data_percent = data_dict['missing_data_percent']
 
-            if missing_data_percent > Config.DATA_FIELD_MISSING_VALUES_THRESHOLD:
-                Config.DATA_FIELDS_IN_ANALYSIS.remove(data_field)
+            if missing_data_percent > Analysis_Config.DATA_FIELD_MISSING_VALUES_THRESHOLD:
+                Analysis_Config.DATA_FIELDS_IN_ANALYSIS.remove(data_field)

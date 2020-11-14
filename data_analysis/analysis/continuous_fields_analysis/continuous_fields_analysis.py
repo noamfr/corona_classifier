@@ -8,9 +8,9 @@ from typing import List, Dict
 
 from analysis_operations.descriptive_table import Descriptive_Table
 
-from data_analysis.data.data_fields import Data_Fields
-from data.vector_builder import Analysis_Vector
-from config.config import Config
+from data_classes.data_fields import Data_Fields
+from data_classes.analysis_vector import Analysis_Vector
+from config.analysis_config import Analysis_Config
 
 
 class Continuous_Fields_Analysis:
@@ -36,7 +36,7 @@ class Continuous_Fields_Analysis:
         vectors_for_analysis = []
         for vector in self.__vectors:
             if vector.field_name in data_fields_for_analysis:
-                if vector.field_name in Config.DATA_FIELDS_IN_ANALYSIS:
+                if vector.field_name in Analysis_Config.DATA_FIELDS_IN_ANALYSIS:
                     vectors_for_analysis.append(vector)
 
         self.__vectors = vectors_for_analysis
@@ -116,7 +116,7 @@ class Continuous_Fields_Analysis:
     @staticmethod
     def bootstrap_difference_in_mean_of_two_groups(vector_1: np.ndarray, vector_2: np.ndarray):
         v1_bigger_than_v2_count = 0
-        for idx in range(Config.BOOTSTRAP_ITERATIONS):
+        for idx in range(Analysis_Config.BOOTSTRAP_ITERATIONS):
 
             vector_1_random = np.random.choice(a=vector_1, size=round(len(vector_1) * 0.75))
             vector_2_random = np.random.choice(a=vector_2, size=round(len(vector_2) * 0.75))
@@ -126,7 +126,7 @@ class Continuous_Fields_Analysis:
             if v1_mean > v2_mean:
                 v1_bigger_than_v2_count += 1
 
-        v1_bigger_than_v2_ratio = v1_bigger_than_v2_count / Config.BOOTSTRAP_ITERATIONS
+        v1_bigger_than_v2_ratio = v1_bigger_than_v2_count / Analysis_Config.BOOTSTRAP_ITERATIONS
         significance_metric = abs(v1_bigger_than_v2_ratio - 0.5) + 0.5
         return significance_metric
 
@@ -154,7 +154,7 @@ class Continuous_Fields_Analysis:
         return vector_dict
 
     def __continuous_fields_quality(self):
-        continuous_fields_normal_values = Config.CONTINUOUS_FIELDS_NORMAL_VALUES
+        continuous_fields_normal_values = Analysis_Config.CONTINUOUS_FIELDS_NORMAL_VALUES
         for analysis_vector in self.__vectors:
             if analysis_vector.field_name != Data_Fields.get_target():
                 if analysis_vector.field_name == Data_Fields.AGE:

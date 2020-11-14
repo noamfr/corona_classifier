@@ -34,7 +34,7 @@ class Analysis_Vector:
         return len(self.__vector)
 
 
-class Vector_Builder:
+class Analysis_Vector_Builder:
     def __init__(self, data_object_list: List, data_fields: List[str]):
         self.__data_object_list = data_object_list
         self.__data_fields = data_fields

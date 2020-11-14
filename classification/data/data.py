@@ -1,8 +1,8 @@
 from typing import List
 
-from data_analysis.data.patient import Patient
-from data_analysis.data.data_fields import Data_Fields
-from data_analysis.data.vector_builder import Vector_Builder, Analysis_Vector
+from data_classes.patient import Patient
+from data_classes.data_fields import Data_Fields
+from data_classes.analysis_vector import Analysis_Vector_Builder, Analysis_Vector
 
 from configuration.classification_config import Classification_Config
 
