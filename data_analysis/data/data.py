@@ -1,7 +1,6 @@
 from typing import List
 
 from .data_reader import Data_Reader
-from .data_field_remover import Data_field_remover
 from .data_fields import Data_Fields
 from .patient import Patient
 from .vector_builder import Vector_Builder, Analysis_Vector

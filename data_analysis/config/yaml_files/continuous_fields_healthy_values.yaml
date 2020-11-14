@@ -1,0 +1,43 @@
+adults_healthy_lower:
+  population: 'adults'
+  threshold_category: 'healthy_values'
+  threshold_type: 'lower'
+  temperature: 35.5
+  pulse: 60
+  sys: 80
+  dia: 50
+  rr: 10
+  sats: 90
+
+adults_healthy_upper:
+  population: 'adults'
+  threshold_category: 'healthy_values'
+  threshold_type: 'upper'
+  temperature: 37.0
+  pulse: 120
+  sys: 130
+  dia: 90
+  rr: 30
+  sats: 100
+
+children_healthy_lower:
+  population: 'children'
+  threshold_category: 'healthy_values'
+  threshold_type: 'lower'
+  temperature: 35.5
+  pulse: 60
+  sys: 60
+  dia: 40
+  rr: 10
+  sats: 90
+
+children_healthy_upper:
+  population: 'children'
+  threshold_category: 'healthy_values'
+  threshold_type: 'upper'
+  temperature: 37.0
+  pulse: 140
+  sys: 90
+  dia: 80
+  rr: 60
+  sats: 100

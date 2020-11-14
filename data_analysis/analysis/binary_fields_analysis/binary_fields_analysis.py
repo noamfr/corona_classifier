@@ -38,7 +38,6 @@ class Binary_Fields_Analysis:
 
         for analysis_vector in self.__vectors:
             clean_vector = analysis_vector.vector_without_missing_values
-
             positive_percent = clean_vector.mean()
             negative_percent = 1 - positive_percent
 

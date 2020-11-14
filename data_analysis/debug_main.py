@@ -12,7 +12,7 @@ if __name__ == '__main__':
     pipeline = Pipeline()
 
     steps = [
-        'get_data',
+        # 'get_data',
         'run_analysis',
         'save_outputs_to_file'
     ]

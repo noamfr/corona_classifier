@@ -2,6 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from collections import defaultdict
 from matplotlib import pyplot as plt
 from typing import List, Dict
 
@@ -24,9 +25,9 @@ class Continuous_Fields_Analysis:
 
     def __run_analysis(self):
         self.__descriptive_table()
+        self.__average_by_target_for_age_groups()
         # self.__correlation_matrix()
-        self.__average_by_target()
-        self.__continuous_fields_quality()
+        # self.__continuous_fields_quality()
 
     def __get_vectors_for_analysis(self):
         data_fields_for_analysis = [Data_Fields.get_target()]
@@ -60,8 +61,112 @@ class Continuous_Fields_Analysis:
             vector_dict[field_name] = vector
         return vector_dict
 
+    def __average_by_target_for_age_groups(self):
+        results = {}
+        vector_dict = self.__get_analysis_vector_dict()
+
+        for response_data_field in Data_Fields.get_continuous_vars():
+            same_length_vectors = self.__get_same_length_vectors(vector_list=[vector_dict[Data_Fields.get_target()],
+                                                                              vector_dict[Data_Fields.AGE.field_name],
+                                                                              vector_dict[response_data_field]
+                                                                              ])
+
+            is_adult = same_length_vectors[Data_Fields.AGE.field_name] >= 18
+
+            target_adult_vector = same_length_vectors[Data_Fields.get_target()][is_adult]
+            response_adult_vector = same_length_vectors[response_data_field][is_adult]
+
+            target_child_vector = same_length_vectors[Data_Fields.get_target()][~is_adult]
+            response_child_vector = same_length_vectors[response_data_field][~is_adult]
+
+            adult_corona_positive_response_vector = response_adult_vector[target_adult_vector == 1]
+            adult_corona_negative_response_vector = response_adult_vector[target_adult_vector == 0]
+            child_corona_positive_response_vector = response_child_vector[target_child_vector == 1]
+            child_corona_negative_response_vector = response_child_vector[target_child_vector == 0]
+
+            adult_bootstrap_significance = self.bootstrap_difference_in_mean_of_two_groups(
+                adult_corona_positive_response_vector,
+                adult_corona_negative_response_vector)
+
+            child_bootstrap_significance = self.bootstrap_difference_in_mean_of_two_groups(
+                child_corona_positive_response_vector,
+                child_corona_negative_response_vector)
+
+            adult_count = len(adult_corona_positive_response_vector) + len(adult_corona_negative_response_vector)
+            adult_count = len(child_corona_positive_response_vector) + len(child_corona_negative_response_vector)
+
+            results[response_data_field] = {
+                'corona_positive': corona_positive_response_vector.mean(),
+                'corona_negative': corona_negative_response_vector.mean(),
+                'bootstrap_significance': bootstrap_significance,
+                'count': count
+            }
+
+        report_table = defaultdict(list)
+        for field_name in results:
+            report_table['field_name'].append(field_name)
+
+            report_table['corona_positive'].append(results[field_name]['corona_positive'])
+            report_table['corona_negative'].append(results[field_name]['corona_negative'])
+            report_table['bootstrap_significance'].append(results[field_name]['bootstrap_significance'])
+            report_table['count'].append(results[field_name]['count'])
+
+        self.__report_tables['average_by_target'] = report_table
+
+    @staticmethod
+    def bootstrap_difference_in_mean_of_two_groups(vector_1: np.ndarray, vector_2: np.ndarray):
+        v1_bigger_than_v2_count = 0
+        for idx in range(Config.BOOTSTRAP_ITERATIONS):
+
+            vector_1_random = np.random.choice(a=vector_1, size=round(len(vector_1) * 0.75))
+            vector_2_random = np.random.choice(a=vector_2, size=round(len(vector_2) * 0.75))
+            v1_mean = vector_1_random.mean()
+            v2_mean = vector_2_random.mean()
+
+            if v1_mean > v2_mean:
+                v1_bigger_than_v2_count += 1
+
+        v1_bigger_than_v2_ratio = v1_bigger_than_v2_count / Config.BOOTSTRAP_ITERATIONS
+        significance_metric = abs(v1_bigger_than_v2_ratio - 0.5) + 0.5
+        return significance_metric
+
+    def __get_same_length_vectors(self, vector_list: List[Analysis_Vector]):
+        same_length_vectors = {}
+        aggregated_missing_idx = self.__get_aggregated_missing_idx(vector_list=vector_list)
+
+        for analysis_vector in vector_list:
+            same_length_vector = np.delete(analysis_vector.vector, aggregated_missing_idx)
+            same_length_vectors[analysis_vector.field_name] = same_length_vector
+        return same_length_vectors
+
+    @staticmethod
+    def __get_aggregated_missing_idx(vector_list: List[Analysis_Vector]):
+        aggregated_missing_idx = set()
+        for vector in vector_list:
+            aggregated_missing_idx.update(vector.missing_values_idx)
+
+        return list(aggregated_missing_idx)
+
+    def __get_analysis_vector_dict(self):
+        vector_dict = {}
+        for analysis_vector in self.__vectors:
+            vector_dict[analysis_vector.field_name] = analysis_vector
+        return vector_dict
+
+    def __continuous_fields_quality(self):
+        continuous_fields_normal_values = Config.CONTINUOUS_FIELDS_NORMAL_VALUES
+        for analysis_vector in self.__vectors:
+            if analysis_vector.field_name != Data_Fields.get_target():
+                if analysis_vector.field_name == Data_Fields.AGE:
+                    age_lower_threshold = 0
+                    age_upper_threshold = 100
+
+            else:
+                continue
+
+
     def __correlation_matrix(self):
-        same_length_vectors = self.__get_same_length_vectors()
+        same_length_vectors = self.__get_same_length_vectors(vector_list=self.__vectors)
         df = pd.DataFrame(same_length_vectors)
 
         corr = df.corr()
@@ -74,29 +179,6 @@ class Continuous_Fields_Analysis:
         plt.title('Correlation Matrix', fontsize=16, fontweight='bold')
         plt.tight_layout()
         plt.savefig(os.path.join(self.local_output_path, 'correlation_matrix.png'))
-
-    def __get_same_length_vectors(self):
-        same_length_vectors = {}
-        aggregated_missing_idx = self.__get_aggregated_missing_idx()
-
-        for analysis_vector in self.__vectors:
-            same_length_vector = np.delete(analysis_vector.vector, aggregated_missing_idx)
-            same_length_vectors[analysis_vector.field_name] = same_length_vector
-
-        return same_length_vectors
-
-    def __get_aggregated_missing_idx(self):
-        aggregated_missing_idx = set()
-        for vector in self.__vectors:
-            aggregated_missing_idx.update(vector.missing_values_idx)
-
-        return aggregated_missing_idx
-
-    def __average_by_target(self):
-        pass
-
-    def __continuous_fields_quality(self):
-        pass
 
     @property
     def get_report_tables(self):
