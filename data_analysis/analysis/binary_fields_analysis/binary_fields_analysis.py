@@ -1,11 +1,11 @@
 from typing import List, Dict
 from collections import defaultdict
 
-from config.config import Config
-from data.vector_builder import Analysis_Vector
+from config.analysis_config import Analysis_Config
+from data_classes.analysis_vector import Analysis_Vector
 from analysis_operations.crosstab import Cross_Tab_Binary
 
-from data_analysis.data.data_fields import Data_Fields
+from data_classes.data_fields import Data_Fields
 
 
 class Binary_Fields_Analysis:
@@ -28,7 +28,7 @@ class Binary_Fields_Analysis:
         vectors_for_analysis = []
         for vector in self.__vectors:
             if vector.field_name in data_fields_for_analysis:
-                if vector.field_name in Config.DATA_FIELDS_IN_ANALYSIS:
+                if vector.field_name in Analysis_Config.DATA_FIELDS_IN_ANALYSIS:
                     vectors_for_analysis.append(vector)
 
         self.__vectors = vectors_for_analysis

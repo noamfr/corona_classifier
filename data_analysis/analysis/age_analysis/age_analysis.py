@@ -6,14 +6,14 @@ from data_operations.data_frame_printer import Data_Frame_Printer
 from analysis_operations.descriptive_table import Descriptive_Table
 from analysis_operations.graph_functions import histogram
 
-from config.config import Config
+from config.analysis_config import Analysis_Config
 
 
 class Age_Analysis:
     def __init__(self, patients: List, publish_results: bool):
         self.patients = patients
         self.publish_results = publish_results
-        self.local_output_path = os.path.join(Config.OUTPUT_PATH, 'age_analysis')
+        self.local_output_path = os.path.join(Analysis_Config.OUTPUT_PATH, 'age_analysis')
 
         self.continuous_vectors = None
         self.categorical_vectors = None

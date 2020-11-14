@@ -14,7 +14,7 @@ if __name__ == '__main__':
 
     steps = [
         'fetch_patients',
-        'data',
+        'data_classes',
         'classification',
         'publish'
     ]
