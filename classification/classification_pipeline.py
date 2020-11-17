@@ -10,16 +10,16 @@ from data.data import Data
 class Classification_Pipeline:
     def __init__(self):
         self.patients: List[Patient] = []
-        self.data: Data = None
+        self.data: Data or None = None
 
     def fetch_patients(self):
         data_reader = Data_Reader(raw_data_path=Classification_Config.RAW_DATA_PATH)
         self.patients = data_reader.get_patients()
 
-    def data(self):
+    def calc_data(self):
         self.data = Data(patients=self.patients)
 
-    def classification(self):
+    def run_classification(self):
         pass
 
     def publish(self):

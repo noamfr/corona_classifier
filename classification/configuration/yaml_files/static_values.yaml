@@ -1,0 +1,2 @@
+data_field_missing_values_threshold: 0.7
+bootstrap_patient_enlargement_size: 0.75

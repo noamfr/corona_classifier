@@ -33,6 +33,24 @@ class Analysis_Vector:
     def get_vector_size(self):
         return len(self.__vector)
 
+    @classmethod
+    def get_same_length_vectors(cls, vector_list: List):
+        same_length_vectors = {}
+        aggregated_missing_idx = cls.get_aggregated_missing_idx(vector_list=vector_list)
+
+        for analysis_vector in vector_list:
+            same_length_vector = np.delete(analysis_vector.vector, aggregated_missing_idx)
+            same_length_vectors[analysis_vector.field_name] = same_length_vector
+        return same_length_vectors
+
+    @classmethod
+    def get_aggregated_missing_idx(cls, vector_list: List):
+        aggregated_missing_idx = set()
+        for vector in vector_list:
+            aggregated_missing_idx.update(vector.missing_values_idx)
+
+        return aggregated_missing_idx
+
 
 class Analysis_Vector_Builder:
     def __init__(self, data_object_list: List, data_fields: List[str]):
@@ -86,3 +104,21 @@ class Vector_Groups:
     TARGET = 'target'
     BINARY_VECTORS = 'binary_vectors'
     CONTINUOUS_VECTORS = 'continuous_vectors'
+
+
+def get_same_length_vectors(vector_list: List[Analysis_Vector]):
+    same_length_vectors = {}
+    aggregated_missing_idx = get_aggregated_missing_idx(vector_list=vector_list)
+
+    for analysis_vector in vector_list:
+        same_length_vector = np.delete(analysis_vector.vector, aggregated_missing_idx)
+        same_length_vectors[analysis_vector.field_name] = same_length_vector
+    return same_length_vectors
+
+
+def get_aggregated_missing_idx(vector_list: List[Analysis_Vector]):
+    aggregated_missing_idx = set()
+    for vector in vector_list:
+        aggregated_missing_idx.update(vector.missing_values_idx)
+
+    return aggregated_missing_idx

@@ -4,7 +4,7 @@ from config.analysis_config import Analysis_Config
 
 SAVE_HISTORY = True
 SAVE_STATE = True
-JOB_KEY = 'corona_classifier'
+JOB_KEY = 'corona_data_analysis'
 CONFIG = Analysis_Config()
 
 if __name__ == '__main__':
@@ -12,12 +12,12 @@ if __name__ == '__main__':
     pipeline = Pipeline()
 
     steps = [
-        'get_data',
-        'run_analysis',
-        'save_outputs_to_file'
+        pipeline.calc_data,
+        pipeline.run_analysis,
+        pipeline.save_outputs_to_file
     ]
 
-    pipeline_executor = Pipeline_Executor(pipeline_object=pipeline,
+    pipeline_executor = Pipeline_Executor(pipeline_class=pipeline,
                                           steps=steps,
                                           save_history=SAVE_HISTORY,
                                           save_state=SAVE_STATE,

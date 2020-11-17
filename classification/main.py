@@ -13,13 +13,13 @@ if __name__ == '__main__':
     pipeline = Classification_Pipeline()
 
     steps = [
-        'fetch_patients',
-        'data_classes',
-        'classification',
-        'publish'
+        pipeline.fetch_patients,
+        pipeline.calc_data,
+        pipeline.run_classification,
+        pipeline.publish
     ]
 
-    pipeline_executor = Pipeline_Executor(pipeline_object=pipeline,
+    pipeline_executor = Pipeline_Executor(pipeline_class=pipeline,
                                           steps=steps,
                                           save_history=SAVE_HISTORY,
                                           save_state=SAVE_STATE,
