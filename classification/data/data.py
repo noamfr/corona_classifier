@@ -1,12 +1,12 @@
-import random
 import numpy as np
+from sklearn.model_selection import train_test_split
 from typing import List, Dict
 
 from data_classes.patient import Patient
 from data_classes.data_fields import Data_Fields
 from data_classes.analysis_vector import Analysis_Vector_Builder, Analysis_Vector
 
-from configuration.classification_config import Classification_Config
+from configuration.classification_config import Classification_Config as config
 
 
 class Data:
@@ -14,6 +14,8 @@ class Data:
         self.__patients = patients
         self.__vectors: List[Analysis_Vector] = []
         self.__same_length_vectors: Dict[str, np.ndarray] = {}
+
+        self.__calc()
 
     def __calc(self):
         self.__binary_one_hot_encoding()
@@ -41,7 +43,7 @@ class Data:
 
     def __bootstrap_enlargement_of_target_positive_patients(self):
         target_positive_patients_idx = self.__get_target_positive_patients_idx(patients=self.__patients)
-        bootstrap_size = Classification_Config.BOOTSTRAP_PATIENT_ENLARGEMENT_SIZE
+        bootstrap_size = config.BOOTSTRAP_PATIENT_ENLARGEMENT_SIZE
 
         idx_to_add = np.random.choice(a=target_positive_patients_idx,
                                       size=round(len(target_positive_patients_idx) * bootstrap_size))
@@ -66,12 +68,20 @@ class Data:
             missing_values_count = analysis_vector.get_missing_values_count
             missing_value_ratio = missing_values_count / all_data_points_count
 
-            if missing_value_ratio > Classification_Config.DATA_FIELD_MISSING_VALUES_THRESHOLD:
-                Classification_Config.DATA_FIELDS_IN_ANALYSIS.remove(data_field_name)
+            if missing_value_ratio > config.DATA_FIELD_MISSING_VALUES_THRESHOLD:
+                config.DATA_FIELDS_IN_ANALYSIS.remove(data_field_name)
+
+        analysis_vectors_idx_to_remove = []
+        for idx in range(len(self.__vectors)):
+            if self.__vectors[idx].field_name not in config.DATA_FIELDS_IN_ANALYSIS:
+                analysis_vectors_idx_to_remove.append(idx)
+
+        for idx in sorted(analysis_vectors_idx_to_remove, reverse=True):
+            del self.__vectors[idx]
 
     def __calc_analysis_vectors(self):
         vector_builder = Analysis_Vector_Builder(data_object_list=self.__patients,
-                                                 data_fields=Classification_Config.DATA_FIELDS_IN_ANALYSIS)
+                                                 data_fields=config.DATA_FIELDS_IN_ANALYSIS)
 
         self.__vectors = vector_builder.analysis_vectors
 
@@ -79,34 +89,24 @@ class Data:
         same_length_vectors = Analysis_Vector.get_same_length_vectors(vector_list=self.__vectors)
         self.__same_length_vectors = same_length_vectors
 
-
-
     def __train_test_split(self):
-        random.shuffle(self.__patients)
-        corona_positive_patients, corona_negative_patients = self.__split_patients_by_target(self.__patients)
+        y = self.__same_length_vectors[Data_Fields.get_target()]
+        predictors_names = [field for field in Data_Fields.get_binary_vars() if field in config.DATA_FIELDS_IN_ANALYSIS]
+        predictors_vectors_tuple = tuple([self.__same_length_vectors[name] for name in predictors_names])
+        X = np.stack(predictors_vectors_tuple, axis=1)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
+
+        self.X_train = X_train
+        self.X_test = X_test
+        self.y_train = y_train
+        self.y_test = y_test
 
 
 
 
 
-    @staticmethod
-    def __split_patients_by_target(patients: [Patient]):
-        corona_positive_patients = []
-        corona_negative_patients = []
-
-        for patient in patients:
-            if patient.covid19_test_results == 1:
-                corona_positive_patients.append(patient)
-            else:
-                corona_negative_patients.append(patient)
-
-        return corona_positive_patients, corona_negative_patients
 
 
-
-    @property
-    def get_patients(self):
-        return self.__patients
 
     @property
     def get_vectors(self):
