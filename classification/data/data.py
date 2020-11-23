@@ -14,6 +14,9 @@ class Data:
         self.__patients = patients
         self.__vectors: List[Analysis_Vector] = []
         self.__same_length_vectors: Dict[str, np.ndarray] = {}
+        self.__training_set: Dict[str, np.ndarray] = {}
+        self.__test_set: Dict[str, np.ndarray] = {}
+        self.__predictors_names: List[str] = []
 
         self.__calc()
 
@@ -24,8 +27,6 @@ class Data:
         self.__remove_data_fields_with_to_much_missing_data()
         self.__get_same_length_vectors()
         self.__train_test_split()
-        self.__calc_analysis_vectors()
-        self.__remove_data_fields_with_to_much_missing_data()
 
     def __binary_one_hot_encoding(self):
         data_fields = [Data_Fields.get_target()] + Data_Fields.get_binary_vars()
@@ -92,21 +93,36 @@ class Data:
     def __train_test_split(self):
         y = self.__same_length_vectors[Data_Fields.get_target()]
         predictors_names = [field for field in Data_Fields.get_binary_vars() if field in config.DATA_FIELDS_IN_ANALYSIS]
+
         predictors_vectors_tuple = tuple([self.__same_length_vectors[name] for name in predictors_names])
         X = np.stack(predictors_vectors_tuple, axis=1)
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
 
-        self.X_train = X_train
-        self.X_test = X_test
-        self.y_train = y_train
-        self.y_test = y_test
+        self.__X_train = X_train
+        self.__X_test = X_test
+        self.__y_train = y_train
+        self.__y_test = y_test
+        self.__predictors_names = predictors_names
 
+    @property
+    def X_train(self):
+        return self.__X_train
 
+    @property
+    def X_test(self):
+        return self.__X_test
 
+    @property
+    def y_train(self):
+        return self.__y_train
 
+    @property
+    def y_test(self):
+        return self.__y_test
 
-
-
+    @property
+    def get_predictors_names(self):
+        return self.__predictors_names
 
     @property
     def get_vectors(self):
