@@ -49,7 +49,7 @@ class Analysis_Vector:
         for vector in vector_list:
             aggregated_missing_idx.update(vector.missing_values_idx)
 
-        return aggregated_missing_idx
+        return list(aggregated_missing_idx)
 
 
 class Analysis_Vector_Builder:

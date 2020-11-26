@@ -10,6 +10,7 @@ class Classification_Config:
     RAW_DATA_PATH: str
     PICKLE_PATH: str
     YAML_FILE_PATH: str
+    OUTPUT_PATH: str
     DATA_FIELDS_IN_ANALYSIS: List
 
     DATA_FIELD_MISSING_VALUES_THRESHOLD: float
@@ -20,7 +21,8 @@ class Classification_Config:
         self.__class__.RAW_DATA_PATH = 'C:/Users/normy/PycharmProjects/covidclinicaldata/data'
         self.__class__.PICKLE_PATH = os.path.join(self.WORK_DIR, 'pickle_files')
         self.__class__.YAML_FILE_PATH = os.path.join(os.path.dirname(__file__), 'yaml_files')
-        self.__class__DATA_FIELDS_IN_ANALYSIS = [Data_Fields.get_target()] + Data_Fields.get_binary_vars()
+        self.__class__.OUTPUT_PATH = os.path.join(self.WORK_DIR, 'outputs')
+        self.__class__.DATA_FIELDS_IN_ANALYSIS = [Data_Fields.get_target()] + Data_Fields.get_binary_vars()
 
         static_values = self.load_yaml(file_name='static_values')
         self.__class__.DATA_FIELD_MISSING_VALUES_THRESHOLD = static_values['data_field_missing_values_threshold']
