@@ -1,11 +1,11 @@
 from pipeline import Pipeline
 from pipeline_operations.pipeline_executor import Pipeline_Executor
-from config.analysis_config import Analysis_Config
+from config.data_analysis_config import Data_Analysis_Config
 
 SAVE_HISTORY = True
 SAVE_STATE = True
 JOB_KEY = 'corona_data_analysis'
-CONFIG = Analysis_Config()
+CONFIG = Data_Analysis_Config()
 
 if __name__ == '__main__':
 
@@ -21,6 +21,6 @@ if __name__ == '__main__':
                                           steps=steps,
                                           save_history=SAVE_HISTORY,
                                           save_state=SAVE_STATE,
-                                          pickle_path=Analysis_Config.PICKLE_PATH,
+                                          pickle_path=Data_Analysis_Config.PICKLE_PATH,
                                           job_key=JOB_KEY)
     pipeline_executor.execute()

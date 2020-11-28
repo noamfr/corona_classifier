@@ -1,7 +1,7 @@
 from typing import List, Dict
 from collections import defaultdict
 
-from config.analysis_config import Analysis_Config
+from config.data_analysis_config import Data_Analysis_Config
 from data_classes.analysis_vector import Analysis_Vector
 from analysis_operations.crosstab import Cross_Tab_Binary
 
@@ -28,7 +28,7 @@ class Binary_Fields_Analysis:
         vectors_for_analysis = []
         for vector in self.__vectors:
             if vector.field_name in data_fields_for_analysis:
-                if vector.field_name in Analysis_Config.DATA_FIELDS_IN_ANALYSIS:
+                if vector.field_name in Data_Analysis_Config.DATA_FIELDS_IN_ANALYSIS:
                     vectors_for_analysis.append(vector)
 
         self.__vectors = vectors_for_analysis
