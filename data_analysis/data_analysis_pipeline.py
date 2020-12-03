@@ -3,7 +3,7 @@ from analysis.analysis import Analysis
 from publish.file_saver import File_Saver
 
 
-class Pipeline:
+class Data_Analysis_Pipeline:
     def __init__(self):
         self.data: Data or None = None
         self.analysis: Analysis or None = None

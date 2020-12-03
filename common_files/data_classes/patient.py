@@ -70,6 +70,13 @@ class Patient:
             return 1
 
     @property
+    def age_group(self):
+        if self.age < 18:
+            return 'child'
+        else:
+            return 'adult'
+
+    @property
     def age_category(self):
         if 0 < self.age <= 2:
             return Age_Groups.BABY
