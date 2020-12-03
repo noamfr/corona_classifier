@@ -1,4 +1,4 @@
-from pipeline import Pipeline
+from data_analysis_pipeline import Data_Analysis_Pipeline
 from pipeline_operations.pipeline_executor import Pipeline_Executor
 from config.data_analysis_config import Data_Analysis_Config
 
@@ -9,7 +9,7 @@ CONFIG = Data_Analysis_Config()
 
 if __name__ == '__main__':
 
-    pipeline = Pipeline()
+    pipeline = Data_Analysis_Pipeline()
 
     steps = [
         pipeline.calc_data,

@@ -1,33 +1,42 @@
 adult:
-  lower:
+  lower_threshold:
     temperature: 35
     pulse: 40
     sys: 65
     dia: 40
     rr: 8
     sats: 70
+    age: 18
+    days_since_symptom_onset: 0
 
-  higher:
+
+  upper_threshold:
     temperature: 41
     pulse: 160
     sys: 210
     dia: 110
     rr: 60
     sats: 100
+    age: 100
+    days_since_symptom_onset: 30
 
 child:
-  lower:
+  lower_threshold:
     temperature: 35
     pulse: 60
     sys: 55
     dia: 30
     rr: 10
     sats: 70
+    age: 0
+    days_since_symptom_onset: 0
 
-  higher:
+  upper_threshold:
     temperature: 41
     pulse: 180
     sys: 110
     dia: 100
     rr: 100
     sats: 100
+    age: 17
+    days_since_symptom_onset: 30

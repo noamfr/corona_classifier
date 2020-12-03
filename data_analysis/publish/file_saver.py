@@ -16,7 +16,7 @@ class File_Saver:
 
     def __save_all_outputs_to_file(self):
         self.__save_report_tables_to_file()
-        self.__save_graphs_to_file()
+        # self.__save_graphs_to_file()
 
     def __save_report_tables_to_file(self):
         df_printer = Data_Frame_Printer(path=Data_Analysis_Config.DATA_ANALYSIS_OUTPUTS_PATH)
