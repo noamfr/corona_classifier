@@ -1,6 +1,6 @@
 import os
 import yaml
-from typing import Set, Dict
+from typing import Set, Dict, List
 
 from data_classes.data_fields import Data_Fields
 
@@ -16,11 +16,10 @@ class Data_Analysis_Config:
 
     DATA_FIELD_MISSING_VALUES_THRESHOLD: float
     BOOTSTRAP_ITERATIONS: int
-    ADULT_AGE_THRESHOLD: int
+
 
     CONTINUOUS_FIELDS_THRESHOLDS: Dict[str, Dict[str, Dict]]
 
-    CONTINUOUS_FIELDS_NORMAL_VALUES: Dict
 
     def __init__(self):
 
@@ -34,11 +33,9 @@ class Data_Analysis_Config:
         static_values = self.load_yaml(file_name='static_values')
         self.__class__.DATA_FIELD_MISSING_VALUES_THRESHOLD = static_values['data_field_missing_values_threshold']
         self.__class__.BOOTSTRAP_ITERATIONS = static_values['bootstrap_iterations']
-        self.__class__.ADULT_AGE_THRESHOLD = static_values['adult_age_threshold']
 
         self.__class__.CONTINUOUS_FIELDS_THRESHOLDS = self.load_yaml(file_name='continuous_fields_thresholds')
 
-        self.__class__.CONTINUOUS_FIELDS_NORMAL_VALUES = self.load_yaml(file_name='continuous_fields_healthy_values')
 
     @classmethod
     def remove_data_field_from_analysis(cls, data_field: str):

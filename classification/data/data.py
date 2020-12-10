@@ -6,7 +6,7 @@ from data_classes.patient import Patient
 from data_classes.data_fields import Data_Fields
 from data_classes.analysis_vector import Analysis_Vector_Builder, Analysis_Vector
 
-from configuration.classification_config import Classification_Config as config
+from configuration.classification_config import Classification_Config as Config
 
 
 class Data:
@@ -16,12 +16,18 @@ class Data:
         self.__same_length_vectors: Dict[str, np.ndarray] = {}
         self.__training_set: Dict[str, np.ndarray] = {}
         self.__test_set: Dict[str, np.ndarray] = {}
-        self.__predictors_names: List[str] = []
+
+        self.predictors_names: List[str] = []
+        self.X_train: np.ndarray or None = None
+        self.X_test: np.ndarray or None = None
+        self.y_train: np.ndarray or None = None
+        self.y_test: np.ndarray or None = None
 
         self.__calc()
 
     def __calc(self):
         self.__binary_one_hot_encoding()
+        self.__replace_un_accepted_vital_values_with_none()
         self.__bootstrap_enlargement_of_target_positive_patients()
         self.__calc_analysis_vectors()
         self.__remove_data_fields_with_to_much_missing_data()
@@ -42,9 +48,43 @@ class Data:
                 else:
                     setattr(patient, field, 1)
 
+    @staticmethod
+    def __calc_thresholds(age_group: str, field_name: str):
+        lower_threshold = Config.get_continuous_field_threshold(age_group=age_group,
+                                                                threshold='lower_threshold',
+                                                                vital_value_name=field_name)
+
+        upper_threshold = Config.get_continuous_field_threshold(age_group=age_group,
+                                                                threshold='upper_threshold',
+                                                                vital_value_name=field_name)
+
+        return lower_threshold, upper_threshold
+
+    def __replace_un_accepted_vital_values_with_none(self):
+        for patient in self.__patients:
+            age_group = patient.age_group
+
+            for field_name in Data_Fields.get_continuous_vars():
+                vital_value = getattr(patient, field_name)
+
+                if vital_value is None:
+                    continue
+
+                lower_threshold = Config.get_continuous_field_threshold(age_group=age_group,
+                                                                        threshold='lower_threshold',
+                                                                        vital_value_name=field_name)
+
+                upper_threshold = Config.get_continuous_field_threshold(age_group=age_group,
+                                                                        threshold='upper_threshold',
+                                                                        vital_value_name=field_name)
+
+                if vital_value > upper_threshold or vital_value < lower_threshold:
+                    setattr(patient, field_name, None)
+
+
     def __bootstrap_enlargement_of_target_positive_patients(self):
         target_positive_patients_idx = self.__get_target_positive_patients_idx(patients=self.__patients)
-        bootstrap_size = config.BOOTSTRAP_PATIENT_ENLARGEMENT_SIZE
+        bootstrap_size = Config.BOOTSTRAP_PATIENT_ENLARGEMENT_SIZE
 
         idx_to_add = np.random.choice(a=target_positive_patients_idx,
                                       size=round(len(target_positive_patients_idx) * bootstrap_size))
@@ -69,12 +109,12 @@ class Data:
             missing_values_count = analysis_vector.get_missing_values_count
             missing_value_ratio = missing_values_count / all_data_points_count
 
-            if missing_value_ratio > config.DATA_FIELD_MISSING_VALUES_THRESHOLD:
-                config.DATA_FIELDS_IN_ANALYSIS.remove(data_field_name)
+            if missing_value_ratio > Config.DATA_FIELD_MISSING_VALUES_THRESHOLD:
+                Config.DATA_FIELDS_IN_ANALYSIS.remove(data_field_name)
 
         analysis_vectors_idx_to_remove = []
         for idx in range(len(self.__vectors)):
-            if self.__vectors[idx].field_name not in config.DATA_FIELDS_IN_ANALYSIS:
+            if self.__vectors[idx].field_name not in Config.DATA_FIELDS_IN_ANALYSIS:
                 analysis_vectors_idx_to_remove.append(idx)
 
         for idx in sorted(analysis_vectors_idx_to_remove, reverse=True):
@@ -82,7 +122,7 @@ class Data:
 
     def __calc_analysis_vectors(self):
         vector_builder = Analysis_Vector_Builder(data_object_list=self.__patients,
-                                                 data_fields=config.DATA_FIELDS_IN_ANALYSIS)
+                                                 data_fields=Config.DATA_FIELDS_IN_ANALYSIS)
 
         self.__vectors = vector_builder.analysis_vectors
 
@@ -92,37 +132,37 @@ class Data:
 
     def __train_test_split(self):
         y = self.__same_length_vectors[Data_Fields.get_target()]
-        predictors_names = [field for field in Data_Fields.get_binary_vars() if field in config.DATA_FIELDS_IN_ANALYSIS]
+        predictors_names = [field for field in Data_Fields.get_binary_vars() if field in Config.DATA_FIELDS_IN_ANALYSIS]
 
         predictors_vectors_tuple = tuple([self.__same_length_vectors[name] for name in predictors_names])
         X = np.stack(predictors_vectors_tuple, axis=1)
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
 
-        self.__X_train = X_train
-        self.__X_test = X_test
-        self.__y_train = y_train
-        self.__y_test = y_test
-        self.__predictors_names = predictors_names
+        self.X_train = X_train
+        self.X_test = X_test
+        self.y_train = y_train
+        self.y_test = y_test
+        self.predictors_names = predictors_names
 
-    @property
-    def X_train(self):
-        return self.__X_train
-
-    @property
-    def X_test(self):
-        return self.__X_test
-
-    @property
-    def y_train(self):
-        return self.__y_train
-
-    @property
-    def y_test(self):
-        return self.__y_test
+    # @property
+    # def X_train(self):
+    #     return self.__X_train
+    #
+    # @property
+    # def X_test(self):
+    #     return self.__X_test
+    #
+    # @property
+    # def y_train(self):
+    #     return self.__y_train
+    #
+    # @property
+    # def y_test(self):
+    #     return self.__y_test
 
     @property
     def get_predictors_names(self):
-        return self.__predictors_names
+        return self.predictors_names
 
     @property
     def get_vectors(self):

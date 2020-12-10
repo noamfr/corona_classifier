@@ -1,7 +1,7 @@
 from typing import List
 
 from configuration.classification_config import Classification_Config as Config
-from classify.classifier import Classifier
+from classify.classification import Classification
 from data_classes.data_reader import Data_Reader
 from data_classes.patient import Patient
 from data.data import Data
@@ -12,7 +12,7 @@ class Classification_Pipeline:
     def __init__(self):
         self.patients: List[Patient] = []
         self.data: Data or None = None
-        self.classifier: Classifier or None = None
+        self.classification: Classification or None = None
         self.publisher: Publisher or None = None
 
     def fetch_patients(self):
@@ -23,7 +23,7 @@ class Classification_Pipeline:
         self.data = Data(patients=self.patients)
 
     def run_classification(self):
-        self.classifier = Classifier(data=self.data)
+        self.classification = Classification(data=self.data)
 
     def publish(self):
-        self.publisher = Publisher(classifier=self.classifier)
+        self.publisher = Publisher(classification=self.classification)
