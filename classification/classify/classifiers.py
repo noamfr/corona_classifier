@@ -23,4 +23,4 @@ class Classifiers:
 
     @classmethod
     def model_names(cls):
-        return ['decision_tree', 'random_forest', 'logistic']
+        return list(cls.get_classifiers().keys())
