@@ -29,7 +29,10 @@ class Classification_Config:
         self.__class__.YAML_FILE_DIR = os.path.join(os.path.dirname(__file__), 'yaml_files')
         self.__class__.COMMON_YAML_FILE_DIR = os.path.join(self.COMMON_FILES_DIR, 'yaml_files')
         self.__class__.OUTPUT_PATH = os.path.join(self.WORK_DIR, 'outputs')
-        self.__class__.DATA_FIELDS_IN_ANALYSIS = [Data_Fields.get_target()] + Data_Fields.get_binary_vars()
+
+        self.__class__.DATA_FIELDS_IN_ANALYSIS = [Data_Fields.get_target(),
+                                                  *Data_Fields.get_binary_vars(),
+                                                  *Data_Fields.get_continuous_vars()]
 
         static_values = self.load_yaml(self.YAML_FILE_DIR, 'static_values')
         self.__class__.DATA_FIELD_MISSING_VALUES_THRESHOLD = static_values['data_field_missing_values_threshold']
