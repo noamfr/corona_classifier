@@ -54,12 +54,18 @@ class Model_Assessment:
         else:
             precision = true_positive / (true_positive + false_positive)
 
+        if precision is None or recall is None or precision + recall == 0:
+            f1_score = None
+        else:
+            f1_score = (2 * precision * recall) / (precision + recall)
+
         accuracy = (true_positive + true_negative) / (true_positive + true_negative + false_positive + false_negative)
 
         self.model_metrics = {
             'recall': recall,
             'precision': precision,
-            'accuracy': accuracy
+            'accuracy': accuracy,
+            'f1_score': f1_score
         }
 
     @property
@@ -89,3 +95,7 @@ class Model_Assessment:
     @property
     def accuracy(self):
         return self.model_metrics['accuracy']
+
+    @property
+    def f1_score(self):
+        return self.model_metrics['f1_score']

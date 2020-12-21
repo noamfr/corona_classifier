@@ -32,6 +32,8 @@ class Data:
         self.__calc_analysis_vectors()
         self.__remove_data_fields_with_to_much_missing_data()
         self.__get_same_length_vectors()
+        self.__normalize_continuous_vectors()
+        # self.__standardize_continuous_vectors()
         self.__train_test_split()
 
     def __binary_one_hot_encoding(self):
@@ -130,6 +132,37 @@ class Data:
         same_length_vectors = Analysis_Vector.get_same_length_vectors(vector_list=self.__vectors)
         self.__same_length_vectors = same_length_vectors
 
+    def __normalize_continuous_vectors(self):
+        normalized_values = []
+
+        for field_name in Data_Fields.get_continuous_vars():
+            if field_name in Config.DATA_FIELDS_IN_ANALYSIS:
+                vector = self.__same_length_vectors[field_name]
+                min_value = vector.min()
+                max_value = vector.max()
+
+                for value in vector:
+                    new_value = (value - min_value) / (max_value - min_value)
+                    normalized_values.append(new_value)
+
+                self.__same_length_vectors[field_name] = np.array(normalized_values)
+
+    def __standardize_continuous_vectors(self):
+        standardized_values = []
+
+        for field_name in Data_Fields.get_continuous_vars():
+            if field_name in Config.DATA_FIELDS_IN_ANALYSIS:
+                vector = self.__same_length_vectors[field_name]
+                mean_value = vector.mean()
+                std_value = vector.std()
+
+                for value in vector:
+                    new_value = (value - mean_value) / std_value
+                    standardized_values.append(new_value)
+
+                self.__same_length_vectors[field_name] = np.array(standardized_values)
+
+
     def __train_test_split(self):
         y = self.__same_length_vectors[Data_Fields.get_target()]
         predictors_names = [field for field in Data_Fields.get_binary_vars() if field in Config.DATA_FIELDS_IN_ANALYSIS]
@@ -143,22 +176,6 @@ class Data:
         self.y_train = y_train
         self.y_test = y_test
         self.predictors_names = predictors_names
-
-    # @property
-    # def X_train(self):
-    #     return self.__X_train
-    #
-    # @property
-    # def X_test(self):
-    #     return self.__X_test
-    #
-    # @property
-    # def y_train(self):
-    #     return self.__y_train
-    #
-    # @property
-    # def y_test(self):
-    #     return self.__y_test
 
     @property
     def get_predictors_names(self):
