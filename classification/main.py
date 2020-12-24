@@ -15,7 +15,7 @@ if __name__ == '__main__':
     steps = [
         # pipeline.fetch_patients,
         # pipeline.calc_data,
-        # pipeline.run_classification,
+        pipeline.run_classification,
         pipeline.publish
     ]
 

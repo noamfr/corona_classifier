@@ -13,8 +13,8 @@ class Classification:
         self.__data = data
         self.__X_train: np.ndarray = data.X_train
         self.__y_train: np.ndarray = data.y_train
-        self.__X_test: np.ndarray = data.X_test
-        self.__y_test: np.ndarray = data.y_test
+        self.__X_val: np.ndarray = data.X_val
+        self.__y_val: np.ndarray = data.y_val
 
         self.__classifiers: Dict = {}
         self.__y_pred_probas: Dict[str, np.ndarray] = {}
@@ -64,6 +64,7 @@ class Classification:
 
                 model_performance[Fields.RECALL].append(model_assessment.recall)
                 model_performance[Fields.PRECISION].append(model_assessment.precision)
+                model_performance[Fields.F1_SCORE].append(model_assessment.f1_score)
                 model_performance[Fields.ACCURACY].append(model_assessment.accuracy)
 
         self.model_performance_for_thresholds = dict(model_performance)
@@ -98,6 +99,7 @@ class Fields:
     RECALL = 'recall'
     PRECISION = 'precision'
     ACCURACY = 'accuracy'
+    F1_SCORE = 'f1_score'
 
     FIELD_ORDER = [
         MODEL_NAME,
@@ -105,6 +107,7 @@ class Fields:
 
         RECALL,
         PRECISION,
+        F1_SCORE,
         ACCURACY,
 
         TRUE_POSITIVE,
