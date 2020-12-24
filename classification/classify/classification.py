@@ -13,8 +13,8 @@ class Classification:
         self.__data = data
         self.__X_train: np.ndarray = data.X_train
         self.__y_train: np.ndarray = data.y_train
-        self.__X_test: np.ndarray = data.X_test
-        self.__y_test: np.ndarray = data.y_test
+        self.__X_val: np.ndarray = data.X_val
+        self.__y_val: np.ndarray = data.y_val
 
         self.__classifiers: Dict = {}
         self.__y_pred_probas: Dict[str, np.ndarray] = {}

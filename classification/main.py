@@ -13,8 +13,8 @@ if __name__ == '__main__':
     pipeline = Classification_Pipeline()
 
     steps = [
-        pipeline.fetch_patients,
-        pipeline.calc_data,
+        # pipeline.fetch_patients,
+        # pipeline.calc_data,
         pipeline.run_classification,
         pipeline.publish
     ]

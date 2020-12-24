@@ -19,8 +19,11 @@ class Data:
 
         self.predictors_names: List[str] = []
         self.X_train: np.ndarray or None = None
+        self.X_val: np.ndarray or None = None
         self.X_test: np.ndarray or None = None
+
         self.y_train: np.ndarray or None = None
+        self.y_val: np.ndarray or None = None
         self.y_test: np.ndarray or None = None
 
         self.__calc()
@@ -34,7 +37,7 @@ class Data:
         self.__get_same_length_vectors()
         self.__normalize_continuous_vectors()
         # self.__standardize_continuous_vectors()
-        self.__train_test_split()
+        self.__train_test_val_split()
 
     def __binary_one_hot_encoding(self):
         data_fields = [Data_Fields.get_target()] + Data_Fields.get_binary_vars()
@@ -163,17 +166,21 @@ class Data:
                 self.__same_length_vectors[field_name] = np.array(standardized_values)
 
 
-    def __train_test_split(self):
+    def __train_test_val_split(self):
         y = self.__same_length_vectors[Data_Fields.get_target()]
         predictors_names = [field for field in Data_Fields.get_binary_vars() if field in Config.DATA_FIELDS_IN_ANALYSIS]
 
         predictors_vectors_tuple = tuple([self.__same_length_vectors[name] for name in predictors_names])
         X = np.stack(predictors_vectors_tuple, axis=1)
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
+        X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
+
 
         self.X_train = X_train
+        self.X_val = X_val
         self.X_test = X_test
         self.y_train = y_train
+        self.y_val = y_val
         self.y_test = y_test
         self.predictors_names = predictors_names
 
