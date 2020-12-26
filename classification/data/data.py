@@ -136,10 +136,9 @@ class Data:
         self.__same_length_vectors = same_length_vectors
 
     def __normalize_continuous_vectors(self):
-        normalized_values = []
-
         for field_name in Data_Fields.get_continuous_vars():
             if field_name in Config.DATA_FIELDS_IN_ANALYSIS:
+                normalized_values = []
                 vector = self.__same_length_vectors[field_name]
                 min_value = vector.min()
                 max_value = vector.max()
@@ -151,10 +150,9 @@ class Data:
                 self.__same_length_vectors[field_name] = np.array(normalized_values)
 
     def __standardize_continuous_vectors(self):
-        standardized_values = []
-
         for field_name in Data_Fields.get_continuous_vars():
             if field_name in Config.DATA_FIELDS_IN_ANALYSIS:
+                standardized_values = []
                 vector = self.__same_length_vectors[field_name]
                 mean_value = vector.mean()
                 std_value = vector.std()
@@ -168,7 +166,9 @@ class Data:
 
     def __train_test_val_split(self):
         y = self.__same_length_vectors[Data_Fields.get_target()]
-        predictors_names = [field for field in Data_Fields.get_binary_vars() if field in Config.DATA_FIELDS_IN_ANALYSIS]
+        binary_fields = [field for field in Data_Fields.get_binary_vars() if field in Config.DATA_FIELDS_IN_ANALYSIS]
+        continuous_fields = [field for field in Data_Fields.get_continuous_vars() if field in Config.DATA_FIELDS_IN_ANALYSIS]
+        predictors_names = binary_fields + continuous_fields
 
         predictors_vectors_tuple = tuple([self.__same_length_vectors[name] for name in predictors_names])
         X = np.stack(predictors_vectors_tuple, axis=1)
