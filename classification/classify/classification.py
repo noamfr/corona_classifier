@@ -6,6 +6,7 @@ from configuration.classification_config import Classification_Config as Config
 from data.data import Data
 from .classifiers import Classifiers
 from .model_assesment import Model_Assessment
+from .table_fields import Model_Performance_Fields, Feature_Importance_Fields
 
 
 class Classification:
@@ -18,7 +19,9 @@ class Classification:
 
         self.__classifiers: Dict = {}
         self.__y_pred_probas: Dict[str, np.ndarray] = {}
+
         self.model_performance_for_thresholds: Dict[str, List] = {}
+        self.feature_importance: Dict[str, List] = {}
 
         self.__calc()
 
@@ -27,6 +30,7 @@ class Classification:
         self.__fit_training_set()
         self.__predict_proba()
         self.__calc_model_performance_for_thresholds()
+        self.__calc_feature_importance()
 
     def __get_classifiers(self):
         self.__classifiers = Classifiers().get_classifiers()
@@ -54,18 +58,18 @@ class Classification:
                 y_pred = self.__calc_y_pred_with_threshold(y_pred_proba, threshold)
                 model_assessment = Model_Assessment(y_true=y_true, y_pred=y_pred)
 
-                model_performance[Fields.MODEL_NAME].append(model_name)
-                model_performance[Fields.THRESHOLD].append(threshold)
+                model_performance[Model_Performance_Fields.MODEL_NAME].append(model_name)
+                model_performance[Model_Performance_Fields.THRESHOLD].append(threshold)
 
-                model_performance[Fields.TRUE_POSITIVE].append(model_assessment.true_positive)
-                model_performance[Fields.FALSE_POSITIVE].append(model_assessment.false_positive)
-                model_performance[Fields.TRUE_NEGATIVE].append(model_assessment.true_negative)
-                model_performance[Fields.FALSE_NEGATIVE].append(model_assessment.false_negative)
+                model_performance[Model_Performance_Fields.TRUE_POSITIVE].append(model_assessment.true_positive)
+                model_performance[Model_Performance_Fields.FALSE_POSITIVE].append(model_assessment.false_positive)
+                model_performance[Model_Performance_Fields.TRUE_NEGATIVE].append(model_assessment.true_negative)
+                model_performance[Model_Performance_Fields.FALSE_NEGATIVE].append(model_assessment.false_negative)
 
-                model_performance[Fields.RECALL].append(model_assessment.recall)
-                model_performance[Fields.PRECISION].append(model_assessment.precision)
-                model_performance[Fields.F1_SCORE].append(model_assessment.f1_score)
-                model_performance[Fields.ACCURACY].append(model_assessment.accuracy)
+                model_performance[Model_Performance_Fields.RECALL].append(model_assessment.recall)
+                model_performance[Model_Performance_Fields.PRECISION].append(model_assessment.precision)
+                model_performance[Model_Performance_Fields.F1_SCORE].append(model_assessment.f1_score)
+                model_performance[Model_Performance_Fields.ACCURACY].append(model_assessment.accuracy)
 
         self.model_performance_for_thresholds = dict(model_performance)
 
@@ -86,31 +90,10 @@ class Classification:
 
         return np.array(y_preds)
 
+    def __calc_feature_importance(self):
+        predictor_names = self.__data.predictors_names
+        feature_importance = self.__classifiers['xgb'].feature_importances_
 
-class Fields:
-    MODEL_NAME = 'model name'
-    THRESHOLD = 'threshold'
-
-    TRUE_POSITIVE = 'true positive'
-    FALSE_POSITIVE = 'false positive'
-    TRUE_NEGATIVE = 'true negative'
-    FALSE_NEGATIVE = 'false negative'
-
-    RECALL = 'recall'
-    PRECISION = 'precision'
-    ACCURACY = 'accuracy'
-    F1_SCORE = 'f1_score'
-
-    FIELD_ORDER = [
-        MODEL_NAME,
-        THRESHOLD,
-
-        RECALL,
-        PRECISION,
-        F1_SCORE,
-        ACCURACY,
-
-        TRUE_POSITIVE,
-        FALSE_POSITIVE,
-        TRUE_NEGATIVE,
-        FALSE_NEGATIVE]
+        self.feature_importance = {
+            Feature_Importance_Fields.PREDICTOR_NAMES: predictor_names,
+            Feature_Importance_Fields.FEATURE_IMPORTANCE: feature_importance}
