@@ -12,12 +12,12 @@ from .table_fields import Model_Performance_Fields, Feature_Importance_Fields
 class Classification:
     def __init__(self, data: Data):
         self.__data = data
+        self.__classifiers: Dict = {}
         self.__X_train: np.ndarray = data.X_train
         self.__y_train: np.ndarray = data.y_train
         self.__X_val: np.ndarray = data.X_val
         self.__y_val: np.ndarray = data.y_val
 
-        self.__classifiers: Dict = {}
         self.__y_pred_probas: Dict[str, np.ndarray] = {}
 
         self.model_performance_for_thresholds: Dict[str, List] = {}
@@ -92,8 +92,22 @@ class Classification:
 
     def __calc_feature_importance(self):
         predictor_names = self.__data.predictors_names
-        feature_importance = self.__classifiers['xgb'].feature_importances_
+        metrics = {
+            'gain': self.__classifiers['xgb'].get_booster().get_score(importance_type="gain"),
+            'weight': self.__classifiers['xgb'].get_booster().get_score(importance_type="weight"),
+            'cover': self.__classifiers['xgb'].get_booster().get_score(importance_type="cover"),
+            'total_gain': self.__classifiers['xgb'].get_booster().get_score(importance_type="total_gain"),
+            'total_cover': self.__classifiers['xgb'].get_booster().get_score(importance_type="total_cover")
+        }
 
-        self.feature_importance = {
-            Feature_Importance_Fields.PREDICTOR_NAMES: predictor_names,
-            Feature_Importance_Fields.FEATURE_IMPORTANCE: feature_importance}
+        feature_importance_dict = defaultdict(list)
+
+        for feature_number in metrics['gain'].keys():
+            predictor_name = predictor_names[int(feature_number.split('f')[1])]
+            feature_importance_dict['predictor name'].append(predictor_name)
+
+            for metric in metrics:
+                feature_importance = metrics[metric][feature_number]
+                feature_importance_dict[metric].append(feature_importance)
+
+        self.feature_importance = dict(feature_importance_dict)
