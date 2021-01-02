@@ -29,9 +29,9 @@ class Publisher:
 
     def __publish_feature_importance(self):
         df = pd.DataFrame(self.__feature_importance)
-        df.sort_values(by=Feature_Importance_Fields.FEATURE_IMPORTANCE, ascending=False, inplace=True)
+        df.sort_values(by='gain', ascending=False, inplace=True)
 
         save_df_as_table(df=df,
-                         column_order=Feature_Importance_Fields.FIELD_ORDER,
+                         column_order=['predictor name', 'gain', 'weight', 'cover', 'total_gain', 'total_cover'],
                          path=Config.OUTPUT_PATH,
                          file_name='Feature_Importance.csv')

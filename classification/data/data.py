@@ -31,11 +31,11 @@ class Data:
     def __calc(self):
         self.__binary_one_hot_encoding()
         self.__replace_un_accepted_vital_values_with_none()
-        self.__bootstrap_enlargement_of_target_positive_patients()
+        # self.__bootstrap_enlargement_of_target_positive_patients()
         self.__calc_analysis_vectors()
         self.__remove_data_fields_with_to_much_missing_data()
         self.__get_same_length_vectors()
-        self.__normalize_continuous_vectors()
+        # self.__normalize_continuous_vectors()
         # self.__standardize_continuous_vectors()
         self.__train_test_val_split()
 
