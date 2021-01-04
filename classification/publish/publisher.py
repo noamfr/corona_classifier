@@ -10,8 +10,8 @@ from configuration.classification_config import Classification_Config as Config
 
 class Publisher:
     def __init__(self, classification: Classification):
-        self.__model_performance_for_thresholds: Dict = classification.model_performance_for_thresholds
-        self.__feature_importance = classification.feature_importance
+        self.__model_performance_for_thresholds: Dict = classification.model_performance_for_thresholds_train
+        self.__feature_importance = classification.feature_importance_train
 
         self.__publish()
 

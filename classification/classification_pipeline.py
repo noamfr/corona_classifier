@@ -22,8 +22,11 @@ class Classification_Pipeline:
     def calc_data(self):
         self.data = Data(patients=self.patients)
 
-    def run_classification(self):
+    def train_classifiers(self):
         self.classification = Classification(data=self.data)
+
+    def predict_on_validation_set(self):
+        pass
 
     def publish(self):
         self.publisher = Publisher(classification=self.classification)

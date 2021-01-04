@@ -35,7 +35,7 @@ class Data:
         self.__calc_analysis_vectors()
         self.__remove_data_fields_with_to_much_missing_data()
         self.__get_same_length_vectors()
-        # self.__normalize_continuous_vectors()
+        self.__normalize_continuous_vectors()
         # self.__standardize_continuous_vectors()
         self.__train_test_val_split()
 
