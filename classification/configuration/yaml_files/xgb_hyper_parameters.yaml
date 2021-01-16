@@ -1,0 +1,9 @@
+max_depth: [2, 5, 7, 10, 20, 30]
+sub_sample: [0.1, 0.2, 0.5, 0.7, 1]
+Column_sample_by_level: [0.1, 0.2, 0.5, 0.7, 1]
+Column_sample_by_tree : [0.1, 0.2, 0.5, 0.7, 1]
+Min_child_weight:
+Lambda: [0, 1]
+alpha: [0, 1]
+n_estimators: [10, 50, 100, 500, 1000]
+learning_rate: [0.0001, 0.001, 0.01, 0.1, 0.5, 0.8]

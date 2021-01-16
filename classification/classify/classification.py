@@ -44,16 +44,6 @@ class Classification:
         for name, model in self.__classifiers.items():
             model.fit(self.__X_train, self.__y_train)
 
-    # def __predict_proba_training_set(self):
-    #     y_preds = {}
-    #
-    #     for name, model in self.__classifiers.items():
-    #         preds = model.predict_proba(self.__X_train)
-    #         preds_covid_positive = np.array([pred[1] for pred in preds])
-    #         y_preds[name] = preds_covid_positive
-    #
-    #     self.__y_pred_probas = y_preds
-
     def __predict_proba_training_set(self):
         self.__y_pred_probas_train = self.__predict_proba(classifiers=self.__classifiers,
                                                           X_set=self.__X_train)
@@ -162,3 +152,6 @@ class Classification:
             y_preds.append(y_pred)
 
         return np.array(y_preds)
+
+    def __tune_XGB_hyper_parameters(self):
+        xgb = self.__classifiers['xgb']
