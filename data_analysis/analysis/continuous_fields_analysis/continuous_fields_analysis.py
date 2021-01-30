@@ -10,7 +10,7 @@ from analysis_operations.descriptive_table import Descriptive_Table
 
 from data_classes.data_fields import Data_Fields
 from data_classes.analysis_vector import Analysis_Vector
-from config.data_analysis_config import Data_Analysis_Config
+from config.data_analysis_config import Data_Analysis_Config as Config
 
 
 class Continuous_Fields_Analysis:
@@ -27,7 +27,6 @@ class Continuous_Fields_Analysis:
         self.__descriptive_table()
         self.__average_by_target_for_age_groups()
         # self.__correlation_matrix()
-        # self.__continuous_fields_quality()
 
     def __get_vectors_for_analysis(self):
         data_fields_for_analysis = [Data_Fields.get_target()]
@@ -36,7 +35,7 @@ class Continuous_Fields_Analysis:
         vectors_for_analysis = []
         for vector in self.__vectors:
             if vector.field_name in data_fields_for_analysis:
-                if vector.field_name in Data_Analysis_Config.DATA_FIELDS_IN_ANALYSIS:
+                if vector.field_name in Config.DATA_FIELDS_IN_ANALYSIS:
                     vectors_for_analysis.append(vector)
 
         self.__vectors = vectors_for_analysis
@@ -62,22 +61,26 @@ class Continuous_Fields_Analysis:
         return vector_dict
 
     def __average_by_target_for_age_groups(self):
-        results = {}
+        report_table = defaultdict(list)
+
         vector_dict = self.__get_analysis_vector_dict()
 
-        for response_data_field in Data_Fields.get_continuous_vars():
+        for continuous_var in Data_Fields.get_continuous_vars():
+            if continuous_var == 'age':
+                continue
+
             same_length_vectors = self.__get_same_length_vectors(vector_list=[vector_dict[Data_Fields.get_target()],
                                                                               vector_dict[Data_Fields.AGE.field_name],
-                                                                              vector_dict[response_data_field]
+                                                                              vector_dict[continuous_var]
                                                                               ])
 
             is_adult = same_length_vectors[Data_Fields.AGE.field_name] >= 18
 
             target_adult_vector = same_length_vectors[Data_Fields.get_target()][is_adult]
-            response_adult_vector = same_length_vectors[response_data_field][is_adult]
+            response_adult_vector = same_length_vectors[continuous_var][is_adult]
 
             target_child_vector = same_length_vectors[Data_Fields.get_target()][~is_adult]
-            response_child_vector = same_length_vectors[response_data_field][~is_adult]
+            response_child_vector = same_length_vectors[continuous_var][~is_adult]
 
             adult_corona_positive_response_vector = response_adult_vector[target_adult_vector == 1]
             adult_corona_negative_response_vector = response_adult_vector[target_adult_vector == 0]
@@ -92,31 +95,42 @@ class Continuous_Fields_Analysis:
                 child_corona_positive_response_vector,
                 child_corona_negative_response_vector)
 
+            adult_corona_positive_bootstrap_mean = self.__calc_bootstrap_mean(adult_corona_positive_response_vector,
+                                                                              iterations=Config.BOOTSTRAP_ITERATIONS)
+
+            adult_corona_negative_bootstrap_mean = self.__calc_bootstrap_mean(adult_corona_negative_response_vector,
+                                                                              iterations=Config.BOOTSTRAP_ITERATIONS)
+
+            child_corona_positive_bootstrap_mean = self.__calc_bootstrap_mean(child_corona_positive_response_vector,
+                                                                              iterations=Config.BOOTSTRAP_ITERATIONS)
+
+            child_corona_negative_bootstrap_mean = self.__calc_bootstrap_mean(child_corona_negative_response_vector,
+                                                                              iterations=Config.BOOTSTRAP_ITERATIONS)
+
             adult_count = len(adult_corona_positive_response_vector) + len(adult_corona_negative_response_vector)
-            adult_count = len(child_corona_positive_response_vector) + len(child_corona_negative_response_vector)
+            child_count = len(child_corona_positive_response_vector) + len(child_corona_negative_response_vector)
 
-            results[response_data_field] = {
-                'corona_positive': corona_positive_response_vector.mean(),
-                'corona_negative': corona_negative_response_vector.mean(),
-                'bootstrap_significance': bootstrap_significance,
-                'count': count
-            }
+            report_table['feature'].append(continuous_var)
+            report_table['adult corona positive regular AVG'].append(np.mean(adult_corona_positive_response_vector))
+            report_table['adult corona negative regular AVG'].append(np.mean(adult_corona_negative_response_vector))
+            report_table['adult corona positive bootstrap AVG'].append(adult_corona_positive_bootstrap_mean)
+            report_table['adult corona negative bootstrap AVG'].append(adult_corona_negative_bootstrap_mean)
+            report_table['adult bootstrap significance'].append(adult_bootstrap_significance)
+            report_table['adult count'].append(adult_count)
 
-        report_table = defaultdict(list)
-        for field_name in results:
-            report_table['field_name'].append(field_name)
-
-            report_table['corona_positive'].append(results[field_name]['corona_positive'])
-            report_table['corona_negative'].append(results[field_name]['corona_negative'])
-            report_table['bootstrap_significance'].append(results[field_name]['bootstrap_significance'])
-            report_table['count'].append(results[field_name]['count'])
+            report_table['child corona positive AVG'].append(np.mean(child_corona_positive_response_vector))
+            report_table['child corona negative AVG'].append(np.mean(child_corona_negative_response_vector))
+            report_table['child corona positive bootstrap AVG'].append(child_corona_positive_bootstrap_mean)
+            report_table['child corona negative bootstrap AVG'].append(child_corona_negative_bootstrap_mean)
+            report_table['child bootstrap significance'].append(child_bootstrap_significance)
+            report_table['child count'].append(child_count)
 
         self.__report_tables['average_by_target'] = report_table
 
     @staticmethod
     def bootstrap_difference_in_mean_of_two_groups(vector_1: np.ndarray, vector_2: np.ndarray):
         v1_bigger_than_v2_count = 0
-        for idx in range(Data_Analysis_Config.BOOTSTRAP_ITERATIONS):
+        for idx in range(Config.BOOTSTRAP_ITERATIONS):
 
             vector_1_random = np.random.choice(a=vector_1, size=round(len(vector_1) * 0.75))
             vector_2_random = np.random.choice(a=vector_2, size=round(len(vector_2) * 0.75))
@@ -126,9 +140,18 @@ class Continuous_Fields_Analysis:
             if v1_mean > v2_mean:
                 v1_bigger_than_v2_count += 1
 
-        v1_bigger_than_v2_ratio = v1_bigger_than_v2_count / Data_Analysis_Config.BOOTSTRAP_ITERATIONS
+        v1_bigger_than_v2_ratio = v1_bigger_than_v2_count / Config.BOOTSTRAP_ITERATIONS
         significance_metric = abs(v1_bigger_than_v2_ratio - 0.5) + 0.5
         return significance_metric
+
+    @staticmethod
+    def __calc_bootstrap_mean(vector: np.ndarray, iterations: int):
+        means = []
+
+        for idx in range(iterations):
+            vector_random = np.random.choice(a=vector, size=round(len(vector) * 0.75))
+            means.append(np.mean(vector_random))
+            return np.mean(means)
 
     def __get_same_length_vectors(self, vector_list: List[Analysis_Vector]):
         same_length_vectors = {}
@@ -152,18 +175,6 @@ class Continuous_Fields_Analysis:
         for analysis_vector in self.__vectors:
             vector_dict[analysis_vector.field_name] = analysis_vector
         return vector_dict
-
-    def __continuous_fields_quality(self):
-        continuous_fields_normal_values = Data_Analysis_Config.CONTINUOUS_FIELDS_NORMAL_VALUES
-        for analysis_vector in self.__vectors:
-            if analysis_vector.field_name != Data_Fields.get_target():
-                if analysis_vector.field_name == Data_Fields.AGE:
-                    age_lower_threshold = 0
-                    age_upper_threshold = 100
-
-            else:
-                continue
-
 
     def __correlation_matrix(self):
         same_length_vectors = self.__get_same_length_vectors(vector_list=self.__vectors)

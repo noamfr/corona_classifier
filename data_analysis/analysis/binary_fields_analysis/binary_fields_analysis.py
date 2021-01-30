@@ -3,7 +3,6 @@ from collections import defaultdict
 
 from config.data_analysis_config import Data_Analysis_Config
 from data_classes.analysis_vector import Analysis_Vector
-from analysis_operations.crosstab import Cross_Tab_Binary
 
 from data_classes.data_fields import Data_Fields
 
@@ -63,26 +62,49 @@ class Binary_Fields_Analysis:
             if analysis_vector.field_name == Data_Fields.get_target():
                 continue
 
-            cross_tab = Cross_Tab_Binary(vector_1=target_vector.vector, vector_2=analysis_vector.vector)
-            field_positive_corona_positive_count = cross_tab.get_cross_tab_count(v1_binary_value=1, v2_binary_value=1)
-            field_positive_corona_negative_count = cross_tab.get_cross_tab_count(v1_binary_value=0, v2_binary_value=1)
-            field_negative_corona_positive_count = cross_tab.get_cross_tab_count(v1_binary_value=1, v2_binary_value=0)
-            field_negative_corona_negative_count = cross_tab.get_cross_tab_count(v1_binary_value=0, v2_binary_value=0)
-            missing_values_count = cross_tab.v2_missing_count
-            corona_positive_percent_for_field_positives = cross_tab.get_perc_v1_positive_from_all_v2_positives()
-            corona_positive_percent_for_field_negatives = cross_tab.get_perc_v1_positive_from_all_v2_negatives()
+            target_pos_feature_pos = 0
+            target_pos_feature_neg = 0
+            target_neg_feature_pos = 0
+            target_neg_feature_neg = 0
+            not_grouped = 0
 
-            report_dict['field'].append(analysis_vector.field_name)
-            report_dict['corona_positive_and_field_positive'].append(corona_positive_percent_for_field_positives)
-            report_dict['corona_positive_and_field_negative'].append(corona_positive_percent_for_field_negatives)
+            for idx in range(len(analysis_vector.vector)):
+                feature_value = analysis_vector.vector[idx]
+                target_value = target_vector.vector[idx]
 
-            report_dict['field_pos_corona_pos_count'].append(field_positive_corona_positive_count)
-            report_dict['field_pos_corona_neg_count'].append(field_positive_corona_negative_count)
-            report_dict['field_neg_corona_pos_count'].append(field_negative_corona_positive_count)
-            report_dict['field_neg_corona_neg_count'].append(field_negative_corona_negative_count)
-            report_dict['missing_values_count'].append(missing_values_count)
+                if feature_value is None or target_value is None:
+                    continue
 
-        self.__report_tables['binary_fields_by_target_table'] = report_dict
+                elif target_value == 1 and feature_value == 1:
+                    target_pos_feature_pos += 1
+
+                elif target_value == 1 and feature_value == 0:
+                    target_pos_feature_neg += 1
+
+                elif target_value == 0 and feature_value == 1:
+                    target_neg_feature_pos += 1
+
+                elif target_value == 0 and feature_value == 0:
+                    target_neg_feature_neg += 1
+
+                else:
+                    not_grouped += 0
+
+            all_valid_tests = target_pos_feature_pos + target_pos_feature_neg + target_neg_feature_pos + target_neg_feature_neg
+
+            feature_pos_within_covid_positive_tests = target_pos_feature_pos / (target_pos_feature_pos + target_pos_feature_neg)
+            feature_pos_within_all_tests = (target_pos_feature_pos + target_neg_feature_pos) / all_valid_tests
+
+            report_dict['feature'].append(analysis_vector.field_name)
+            report_dict['feature positive within covid positive tests'].append(feature_pos_within_covid_positive_tests)
+            report_dict['feature positive within all tests'].append(feature_pos_within_all_tests)
+            report_dict['target positive feature positive'].append(target_pos_feature_pos)
+            report_dict['target positive feature negative'].append(target_pos_feature_neg)
+            report_dict['target negative feature positive'].append(target_neg_feature_pos)
+            report_dict['target negative feature negative'].append(target_neg_feature_neg)
+            report_dict['all valid tests'].append(all_valid_tests)
+
+        self.__report_tables['binary_fields_by_target_table'] = dict(report_dict)
 
     def __get_single_vector(self, vector_name: str):
         for analysis_vector in self.__vectors:

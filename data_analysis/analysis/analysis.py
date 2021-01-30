@@ -19,10 +19,10 @@ class Analysis:
         self.__calc()
 
     def __calc(self):
-        # self.__missing_values_analysis()
-        # self.__binary_fields_analysis()
+        self.__missing_values_analysis()
+        self.__binary_fields_analysis()
         self.__continuous_data_fields_QA()
-        # self.__continuous_fields_analysis()
+        self.__continuous_fields_analysis()
         # self.__age_analysis()
 
     def __missing_values_analysis(self):
