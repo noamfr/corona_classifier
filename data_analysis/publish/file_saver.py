@@ -9,14 +9,14 @@ from config.data_analysis_config import Data_Analysis_Config
 class File_Saver:
     def __init__(self, analysis: Analysis):
         self.analysis = analysis
-        self.__report_tables = self.analysis.get_report_tables
-        self.__graph_vectors = self.analysis.get_graph_vectors
+        self.__report_tables = self.analysis.report_tables
+        self.__graph_vectors = self.analysis.graph_vectors
 
         self.__save_all_outputs_to_file()
 
     def __save_all_outputs_to_file(self):
         self.__save_report_tables_to_file()
-        # self.__save_graphs_to_file()
+        self.__save_graphs_to_file()
 
     def __save_report_tables_to_file(self):
         df_printer = Data_Frame_Printer(path=Data_Analysis_Config.DATA_ANALYSIS_OUTPUTS_PATH)

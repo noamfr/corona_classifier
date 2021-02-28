@@ -16,7 +16,9 @@ class Data_Analysis_Config:
 
     DATA_FIELDS_IN_ANALYSIS: Set[str]
 
+    PATIENT_MISSING_VALUES_THRESHOLD: int
     DATA_FIELD_MISSING_VALUES_THRESHOLD: float
+
     BOOTSTRAP_ITERATIONS: int
 
 
@@ -35,7 +37,9 @@ class Data_Analysis_Config:
         self.__class__.DATA_FIELDS_IN_ANALYSIS = set(Data_Fields.get_all_data_fields())
 
         static_values = self.load_local_yaml(file_name='static_values')
+        self.__class__.PATIENT_MISSING_VALUES_THRESHOLD = static_values['patient_missing_values_threshold']
         self.__class__.DATA_FIELD_MISSING_VALUES_THRESHOLD = static_values['data_field_missing_values_threshold']
+
         self.__class__.BOOTSTRAP_ITERATIONS = static_values['bootstrap_iterations']
 
         self.__class__.CONTINUOUS_FIELDS_THRESHOLDS = self.load_common_yaml(file_name='continuous_fields_thresholds')

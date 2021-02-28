@@ -69,6 +69,9 @@ class Continuous_Fields_Analysis:
             if continuous_var == 'age':
                 continue
 
+            if continuous_var not in Config.DATA_FIELDS_IN_ANALYSIS:
+                continue
+
             same_length_vectors = self.__get_same_length_vectors(vector_list=[vector_dict[Data_Fields.get_target()],
                                                                               vector_dict[Data_Fields.AGE.field_name],
                                                                               vector_dict[continuous_var]
