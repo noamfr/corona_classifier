@@ -1,3 +1,4 @@
+patient_missing_values_threshold: 16
 data_field_missing_values_threshold: 0.7
 bootstrap_iterations: 1000
 adult_age_threshold: 18
