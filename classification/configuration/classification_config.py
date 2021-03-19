@@ -16,6 +16,7 @@ class Classification_Config:
     DATA_FIELDS_IN_ANALYSIS: List
 
     DATA_FIELD_MISSING_VALUES_THRESHOLD: float
+    PATIENT_MISSING_VALUES_THRESHOLD: int
     BOOTSTRAP_PATIENT_ENLARGEMENT_SIZE: float
     MODEL_THRESHOLDS: List[float]
 
@@ -24,7 +25,7 @@ class Classification_Config:
     def __init__(self):
         self.__class__.WORK_DIR = 'C:/Users/normy/corona_classifier_files/classification'
         self.__class__.COMMON_FILES_DIR = 'C:/Users/normy/PycharmProjects/corona_classifier/common_files'
-        self.__class__.RAW_DATA_PATH = 'C:/Users/normy/PycharmProjects/covidclinicaldata/data'
+        self.__class__.RAW_DATA_PATH = os.environ['RAW_DATA_PATH']
         self.__class__.PICKLE_PATH = os.path.join(self.WORK_DIR, 'pickle_files')
         self.__class__.YAML_FILE_DIR = os.path.join(os.path.dirname(__file__), 'yaml_files')
         self.__class__.COMMON_YAML_FILE_DIR = os.path.join(self.COMMON_FILES_DIR, 'yaml_files')
@@ -36,6 +37,7 @@ class Classification_Config:
 
         static_values = self.load_yaml(self.YAML_FILE_DIR, 'static_values')
         self.__class__.DATA_FIELD_MISSING_VALUES_THRESHOLD = static_values['data_field_missing_values_threshold']
+        self.__class__.PATIENT_MISSING_VALUES_THRESHOLD = static_values['patient_missing_values_threshold']
         self.__class__.BOOTSTRAP_PATIENT_ENLARGEMENT_SIZE = static_values['bootstrap_patient_enlargement_size']
         self.__class__.MODEL_THRESHOLDS = static_values['model_thresholds']
 
