@@ -29,21 +29,30 @@ class Data:
         self.__calc()
 
     def __calc(self):
+        self.__replace_empty_strings_with_none()
         self.__binary_one_hot_encoding()
-        self.__replace_un_accepted_vital_values_with_none()
-        # self.__bootstrap_enlargement_of_target_positive_patients()
-        self.__calc_analysis_vectors()
         self.__remove_data_fields_with_to_much_missing_data()
+        self.__remove_patients_with_to_much_missing_values()
+        self.__replace_un_accepted_vital_values_with_none()
+        self.__bootstrap_enlargement_of_target_positive_patients()
+        self.__calc_analysis_vectors()
         self.__get_same_length_vectors()
-        # self.__normalize_continuous_vectors()
-        # self.__standardize_continuous_vectors()
+        self.__normalize_continuous_vectors()
+        self.__standardize_continuous_vectors()
         self.__train_test_val_split()
 
+    def __replace_empty_strings_with_none(self):
+        data_fields = Data_Fields.get_all_data_fields()
+        for patient in self.__patients:
+            for data_field in data_fields:
+                if getattr(patient, data_field) == '':
+                    setattr(patient, data_field, None)
+
     def __binary_one_hot_encoding(self):
-        data_fields = [Data_Fields.get_target()] + Data_Fields.get_binary_vars()
+        binary_data_fields = [Data_Fields.get_target()] + Data_Fields.get_binary_vars()
 
         for patient in self.__patients:
-            for field in data_fields:
+            for field in binary_data_fields:
                 if getattr(patient, field) is None:
                     continue
 
@@ -52,6 +61,34 @@ class Data:
 
                 else:
                     setattr(patient, field, 1)
+
+    def __remove_data_fields_with_to_much_missing_data(self):
+        for data_field in Data_Fields.get_all_data_fields():
+            missing_data_count = 0
+            for patient in self.__patients:
+                if getattr(patient, data_field) is None:
+                    missing_data_count += 1
+
+            missing_data_ratio = missing_data_count / len(self.__patients)
+            if missing_data_ratio >= Config.DATA_FIELD_MISSING_VALUES_THRESHOLD:
+                if data_field in Config.DATA_FIELDS_IN_ANALYSIS:
+                    Config.DATA_FIELDS_IN_ANALYSIS.remove(data_field)
+
+    def __remove_patients_with_to_much_missing_values(self):
+        idx_to_remove = set()
+        for idx in range(len(self.__patients)):
+            missing_values_count = 0
+
+            for data_field in Config.DATA_FIELDS_IN_ANALYSIS:
+                if getattr(self.__patients[idx], data_field) is None:
+                    missing_values_count += 1
+
+            if missing_values_count > Config.PATIENT_MISSING_VALUES_THRESHOLD:
+                idx_to_remove.add(idx)
+
+        idx_to_remove = sorted(idx_to_remove, reverse=True)
+        for idx in idx_to_remove:
+            self.__patients.pop(idx)
 
     @staticmethod
     def __calc_thresholds(age_group: str, field_name: str):
@@ -106,24 +143,6 @@ class Data:
                 target_positive_patients_idx.append(idx)
 
         return target_positive_patients_idx
-
-    def __remove_data_fields_with_to_much_missing_data(self):
-        for analysis_vector in self.__vectors:
-            data_field_name = analysis_vector.field_name
-            all_data_points_count = analysis_vector.get_vector_size
-            missing_values_count = analysis_vector.get_missing_values_count
-            missing_value_ratio = missing_values_count / all_data_points_count
-
-            if missing_value_ratio > Config.DATA_FIELD_MISSING_VALUES_THRESHOLD:
-                Config.DATA_FIELDS_IN_ANALYSIS.remove(data_field_name)
-
-        analysis_vectors_idx_to_remove = []
-        for idx in range(len(self.__vectors)):
-            if self.__vectors[idx].field_name not in Config.DATA_FIELDS_IN_ANALYSIS:
-                analysis_vectors_idx_to_remove.append(idx)
-
-        for idx in sorted(analysis_vectors_idx_to_remove, reverse=True):
-            del self.__vectors[idx]
 
     def __calc_analysis_vectors(self):
         vector_builder = Analysis_Vector_Builder(data_object_list=self.__patients,
