@@ -38,7 +38,7 @@ class Data:
         self.__calc_analysis_vectors()
         self.__get_same_length_vectors()
         self.__normalize_continuous_vectors()
-        self.__standardize_continuous_vectors()
+        # self.__standardize_continuous_vectors()
         self.__train_test_val_split()
 
     def __replace_empty_strings_with_none(self):

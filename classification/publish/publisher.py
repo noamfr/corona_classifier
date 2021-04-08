@@ -4,18 +4,22 @@ from typing import Dict
 from data_operations.df_printer import save_df_as_table
 
 from classify.classification import Classification
+from classify.xgb_classification import Xgb_Classification
 from classify.table_fields import Model_Performance_Fields, Feature_Importance_Fields
 from configuration.classification_config import Classification_Config as Config
 
 
 class Publisher:
-    def __init__(self, classification: Classification):
+    def __init__(self, classification: Classification or Xgb_Classification):
+        self.__base_model_performance = classification.base_model_performance
         self.__model_performance_for_thresholds: Dict = classification.model_performance_for_thresholds
         self.__feature_importance = classification.feature_importance
 
         self.__publish()
 
     def __publish(self):
+        self.__publish_model_performance(self.__base_model_performance)
+
         self.__publish_model_performance_for_thresholds()
         self.__publish_feature_importance()
 
@@ -35,3 +39,12 @@ class Publisher:
                          column_order=['predictor name', 'gain', 'weight', 'cover', 'total_gain', 'total_cover'],
                          path=Config.OUTPUT_PATH,
                          file_name='Feature_Importance.csv')
+
+    @staticmethod
+    def __publish_model_performance(output_dict: Dict):
+        df = pd.DataFrame(output_dict)
+
+        save_df_as_table(df=df,
+                         column_order=Model_Performance_Fields.FIELD_ORDER[1:],
+                         path=Config.OUTPUT_PATH,
+                         file_name='model_performance_for_thresholds.csv')

@@ -21,6 +21,7 @@ class Classification_Config:
     MODEL_THRESHOLDS: List[float]
 
     CONTINUOUS_FIELDS_THRESHOLDS: Dict[str, Dict[str, Dict[str, int]]]
+    XGB_BASE_MODEL_VALUES: Dict[str, float or int]
 
     def __init__(self):
         self.__class__.WORK_DIR = 'C:/Users/normy/corona_classifier_files/classification'
@@ -42,6 +43,9 @@ class Classification_Config:
         self.__class__.MODEL_THRESHOLDS = static_values['model_thresholds']
 
         self.__class__.CONTINUOUS_FIELDS_THRESHOLDS = self.load_yaml(self.COMMON_YAML_FILE_DIR, 'continuous_fields_thresholds')
+
+        self.__class__.XGB_BASE_MODEL_VALUES = self.load_yaml(self.YAML_FILE_DIR, 'xgb_base_model_values')
+
 
     @classmethod
     def remove_data_field_from_analysis(cls, data_field: str):

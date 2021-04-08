@@ -2,6 +2,7 @@ from typing import List
 
 from configuration.classification_config import Classification_Config as Config
 from classify.classification import Classification
+from classify.xgb_classification import Xgb_Classification
 from data_classes.data_reader import Data_Reader
 from data_classes.patient import Patient
 from data.data import Data
@@ -22,8 +23,11 @@ class Classification_Pipeline:
     def calc_data(self):
         self.data = Data(patients=self.patients)
 
-    def run_classification(self):
+    def run_general_classification(self):
         self.classification = Classification(data=self.data)
+
+    def run_xgb_classification(self):
+        self.classification = Xgb_Classification(data=self.data)
 
     def publish(self):
         self.publisher = Publisher(classification=self.classification)
