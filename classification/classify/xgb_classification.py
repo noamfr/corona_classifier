@@ -26,10 +26,12 @@ class Xgb_Classification:
         self.model_performance_for_thresholds: Dict[str, List] = {}
         self.feature_importance: Dict[str, List] = {}
 
-        self.__base_model: XGBClassifier = None
+        self.__base_model: XGBClassifier = XGBClassifier(seed=143)
         self.base_model_performance: Dict[str, List] = {}
 
         self.__calc_base_model()
+        self.__tune_learning_rate()
+        self.__tune_n_estimators()
 
     def __calc_base_model(self):
         self.__fit_base_model()
@@ -37,16 +39,16 @@ class Xgb_Classification:
         self.base_model_performance = self.__calc_model_performance(y=self.__y_train, pred_proba=pred_proba)
 
     def __fit_base_model(self):
-        self.__base_model = XGBClassifier(
-            learning_rate=Config.XGB_BASE_MODEL_VALUES['learning_rate'],
-            n_estimators=Config.XGB_BASE_MODEL_VALUES['n_estimators'],
-            max_depth=Config.XGB_BASE_MODEL_VALUES['max_depth'],
-            min_child_weight=Config.XGB_BASE_MODEL_VALUES['min_child_weight'],
-            gamma=Config.XGB_BASE_MODEL_VALUES['gamma'],
-            colsample_bytree=Config.XGB_BASE_MODEL_VALUES['colsample_bytree'],
-            scale_pos_weight=Config.XGB_BASE_MODEL_VALUES['scale_pos_weight'],
-            random_state=Config.XGB_BASE_MODEL_VALUES['random_state']
-        )
+        # self.__base_model = XGBClassifier(
+        #     learning_rate=Config.XGB_BASE_MODEL_VALUES['learning_rate'],
+        #     n_estimators=Config.XGB_BASE_MODEL_VALUES['n_estimators'],
+        #     max_depth=Config.XGB_BASE_MODEL_VALUES['max_depth'],
+        #     min_child_weight=Config.XGB_BASE_MODEL_VALUES['min_child_weight'],
+        #     gamma=Config.XGB_BASE_MODEL_VALUES['gamma'],
+        #     colsample_bytree=Config.XGB_BASE_MODEL_VALUES['colsample_bytree'],
+        #     scale_pos_weight=Config.XGB_BASE_MODEL_VALUES['scale_pos_weight'],
+        #     random_state=Config.XGB_BASE_MODEL_VALUES['random_state']
+        # )
 
         self.__base_model.fit(self.__X_train, self.__y_train)
 
@@ -95,9 +97,9 @@ class Xgb_Classification:
         return np.array(y_preds)
 
     def __tune_learning_rate(self):
-        xgb_model = XGBClassifier(random_state=42, n_estimators=300)
+        # xgb_model = XGBClassifier(random_state=42, n_estimators=300)
         param_grid = {'learning_rate': [0.01, 0.05, 0.1, 0.3, 0.5, 0.8]}
-        clf = GridSearchCV(xgb_model, param_grid, scoring='recall')
+        clf = GridSearchCV(self.__base_model, param_grid, scoring='recall', n_jobs=-1, verbose=1)
         clf.fit(self.__X_train, self.__y_train)
 
         results = clf.cv_results_
@@ -105,6 +107,20 @@ class Xgb_Classification:
         df_short = df[['params', 'mean_test_score', 'rank_test_score']]
         df_short.columns
 
+        best_learning_rate_value = list(clf.best_params_.values())[0]
+        self.__base_model = XGBClassifier(seed=143, learning_rate=best_learning_rate_value)
+        print(clf.best_params_)
+        print(clf.best_score_)
+
+    def __tune_n_estimators(self):
+        param_grid = {'n_estimators': [10, 100, 500, 750, 1000]}
+        clf = GridSearchCV(self.__base_model, param_grid, scoring='recall', n_jobs=-1, verbose=1)
+        clf.fit(self.__X_train, self.__y_train)
+
+        results = clf.cv_results_
+        df = pd.DataFrame(clf.cv_results_)
+        df_short = df[['params', 'mean_test_score', 'rank_test_score']]
+        df_short.columns
 
 
 
