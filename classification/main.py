@@ -3,7 +3,7 @@ from pipeline_operations.pipeline_executor import Pipeline_Executor
 from configuration.classification_config import Classification_Config
 from classification_pipeline import Classification_Pipeline
 
-DELETE_HISTORY = False
+DELETE_HISTORY = True
 SAVE_STATE = True
 JOB_KEY = 'corona_classification'
 CONFIG = Classification_Config()
@@ -13,10 +13,10 @@ if __name__ == '__main__':
     pipeline = Classification_Pipeline()
 
     steps = [
-        # pipeline.fetch_patients,
-        # pipeline.calc_data,
-        # pipeline.run_general_classification,
-        # pipeline.run_xgb_classification,
+        pipeline.fetch_patients,
+        pipeline.calc_data,
+        pipeline.run_general_classification,
+        pipeline.run_xgb_classification,
         pipeline.publish
     ]
 
